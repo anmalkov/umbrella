@@ -1,2 +1,2 @@
-# umbrella
+# Umbrella
 Simple home automation
