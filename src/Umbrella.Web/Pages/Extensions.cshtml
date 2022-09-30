@@ -1,0 +1,94 @@
+﻿@page
+@model Umbrella.Web.Pages.ExtensionsModel
+@{
+	ViewData["Title"] = "Extensions";
+}
+
+
+@if (!string.IsNullOrWhiteSpace(Model.Error))
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>@Model.Error</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<h1 class="swimlane">Registered</h1>
+<div class="row">
+    @if (Model.Extensions.Any(e => e.Registered))
+    {
+        @foreach (var extension in Model.Extensions.Where(e => e.Registered))
+        {
+            <div class="col-3">
+                <div class="card widget">
+                    <div class="card-body">
+                        <h5 class="card-title">@extension.DisplayName</h5>
+                        @if (extension.EntitiesCount > 0)
+                        {
+                            <p class="card-text"><a href="/Entities">Show @extension.EntitiesCount entities</a></p>
+                        }
+                        <button type="button" class="btn btn-secondary btn-sm">Unregister</button>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-3">
+            <div class="card widget">
+                <div class="card-body">
+            		<p>No extensions registered.</p>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+<h1 class="swimlane">Not Registered</h1>
+<div class="row">
+    @if (Model.Extensions.Any(e => !e.Registered))
+    {
+        @foreach (var extension in Model.Extensions.Where(e => !e.Registered))
+        {
+            <div class="col-3">
+                <div class="card widget">
+                    <div class="card-body">
+                        <h5 class="card-title">@extension.DisplayName</h5>
+                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#@extension.Id">Register</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="@extension.Id" tabindex="-1" aria-labelledby="@extension.Id-title" aria-hidden="true" role="dialog">
+                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="@extension.Id-title">Register @extension.DisplayName</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form method="post">
+                            <input type="hidden" name="extension-id" value="@extension.Id" />
+                            <div class="modal-body">
+                                @Html.Raw(extension.HtmlForRegistration)
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary btn-sm">Register</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+    } 
+    else
+    {
+        <div class="col-3">
+            <div class="card widget">
+                <div class="card-body">
+                    <p>All extensions are registered.</p>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+

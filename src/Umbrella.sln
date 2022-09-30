@@ -1,0 +1,61 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.32912.340
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbrella.Core", "Umbrella.Core\Umbrella.Core.csproj", "{9DC521CB-1F6C-48F7-90CA-87B5976F8913}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbrella.Core.Tests", "Umbrella.Core.Tests\Umbrella.Core.Tests.csproj", "{61CCE5E1-5E01-4E8C-BED9-39BA8651E451}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbrella.Extensions.Hue", "Umbrella.Extensions.Hue\Umbrella.Extensions.Hue.csproj", "{AC7401ED-450B-49B1-B61D-07576ACBAF7B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbrella.Web", "Umbrella.Web\Umbrella.Web.csproj", "{AACE0863-6B64-4012-85E3-57A5088C93D1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbrella.Extensions.Xiaomi", "Umbrella.Extensions.Xiaomi\Umbrella.Extensions.Xiaomi.csproj", "{CFEDB0BA-2D13-4C85-8F36-8EDF3965471A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhilipsHue.Sdk", "PhilipsHue.Sdk\PhilipsHue.Sdk.csproj", "{16B2C004-F482-4BE5-AAC1-1CEE3F69339D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhilipsHue.Sdk.Tests", "PhilipsHue.Sdk.Tests\PhilipsHue.Sdk.Tests.csproj", "{7B675307-8278-4AE7-B81A-BEBB4A12F29E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9DC521CB-1F6C-48F7-90CA-87B5976F8913}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9DC521CB-1F6C-48F7-90CA-87B5976F8913}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9DC521CB-1F6C-48F7-90CA-87B5976F8913}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9DC521CB-1F6C-48F7-90CA-87B5976F8913}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61CCE5E1-5E01-4E8C-BED9-39BA8651E451}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61CCE5E1-5E01-4E8C-BED9-39BA8651E451}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61CCE5E1-5E01-4E8C-BED9-39BA8651E451}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61CCE5E1-5E01-4E8C-BED9-39BA8651E451}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC7401ED-450B-49B1-B61D-07576ACBAF7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC7401ED-450B-49B1-B61D-07576ACBAF7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC7401ED-450B-49B1-B61D-07576ACBAF7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC7401ED-450B-49B1-B61D-07576ACBAF7B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AACE0863-6B64-4012-85E3-57A5088C93D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AACE0863-6B64-4012-85E3-57A5088C93D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AACE0863-6B64-4012-85E3-57A5088C93D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AACE0863-6B64-4012-85E3-57A5088C93D1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CFEDB0BA-2D13-4C85-8F36-8EDF3965471A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CFEDB0BA-2D13-4C85-8F36-8EDF3965471A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CFEDB0BA-2D13-4C85-8F36-8EDF3965471A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CFEDB0BA-2D13-4C85-8F36-8EDF3965471A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{16B2C004-F482-4BE5-AAC1-1CEE3F69339D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16B2C004-F482-4BE5-AAC1-1CEE3F69339D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16B2C004-F482-4BE5-AAC1-1CEE3F69339D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16B2C004-F482-4BE5-AAC1-1CEE3F69339D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B675307-8278-4AE7-B81A-BEBB4A12F29E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B675307-8278-4AE7-B81A-BEBB4A12F29E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B675307-8278-4AE7-B81A-BEBB4A12F29E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B675307-8278-4AE7-B81A-BEBB4A12F29E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DB7FA0DE-848F-4E34-A0AD-C6742506155E}
+	EndGlobalSection
+EndGlobal

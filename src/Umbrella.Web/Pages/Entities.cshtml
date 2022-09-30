@@ -1,0 +1,27 @@
+﻿@page
+@model Umbrella.Web.Pages.EntitiesModel
+@{
+	ViewData["Title"] = "Entities";
+}
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col"></th>
+      <th scope="col">Name</th>
+      <th scope="col">ID</th>
+      <th scope="col">Owner</th>
+    </tr>
+  </thead>
+  <tbody>
+	@foreach (var entity in Model.Entities)
+	{
+	  <tr>
+		<td></td>
+		<td>@entity.Name</td>
+		<td>@entity.Id</td>
+		<td>@entity.Owner</td>
+	  </tr>
+	}
+  </tbody>	
+</table>
