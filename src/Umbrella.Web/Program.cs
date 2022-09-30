@@ -16,7 +16,7 @@ builder.Services.AddTransient<IExtension, XiaomiExtension>();
 builder.Services.AddScoped<IExtensionsService, ExtensionsService>();
 builder.Services.AddSingleton<IExtensionRepository, ExtensionRepository>();
 builder.Services.AddSingleton<IConfigurationRepository, ConfigurationRepository>();
-builder.Services.AddScoped<ICoreService, CoreService>();
+builder.Services.AddScoped<IRegistrationService, RegistrationService>();
 builder.Services.AddScoped<IEntitiesService, EntitiesService>();
 builder.Services.AddSingleton<IEntitiesRepository, EntitiesRepository>();
 

@@ -3,7 +3,7 @@ using Umbrella.Core.Models;
 
 namespace Umbrella.Core.Services;
 
-public interface ICoreService
+public interface IRegistrationService
 {
     Task RegisterEntityAsync(IEntity entity, string extensionId);
 }

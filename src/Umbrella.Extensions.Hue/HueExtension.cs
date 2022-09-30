@@ -16,7 +16,7 @@ public class HueExtension : IExtension
     private const string DeviceName = "ExtensionHue";
 
     private readonly HttpClient _httpClient;
-    private readonly ICoreService _coreService;
+    private readonly IRegistrationService _coreService;
     private IHueClient? _hueClient;
 
     public string Id => "hue";
@@ -31,9 +31,9 @@ public class HueExtension : IExtension
   </div>
   <p><b>NOTE:</b> Please make sure that you press the button on your Philips Hue Hub before you press 'Register' button below</p>";
 
-    public HueExtension(ICoreService coreService) : this (coreService, null) { }
+    public HueExtension(IRegistrationService coreService) : this (coreService, null) { }
 
-    public HueExtension(ICoreService coreService, HttpClient? httpClient)
+    public HueExtension(IRegistrationService coreService, HttpClient? httpClient)
     {
         if (httpClient is null)
         {
@@ -50,7 +50,7 @@ public class HueExtension : IExtension
     }
     
 
-    public HueExtension(ICoreService coreService, HttpClient? httpClient, IHueClient hueClient)
+    public HueExtension(IRegistrationService coreService, HttpClient? httpClient, IHueClient hueClient)
         : this(coreService, httpClient)
     {
         _hueClient = hueClient;

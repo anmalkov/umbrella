@@ -7,11 +7,11 @@ using Umbrella.Core.Repositories;
 
 namespace Umbrella.Core.Services;
 
-public sealed class CoreService : ICoreService
+public sealed class RegistrationService : IRegistrationService
 {
     private readonly IEntitiesService _entitiesService;
 
-    public CoreService(IEntitiesService entitiesService)
+    public RegistrationService(IEntitiesService entitiesService)
     {
         _entitiesService = entitiesService;
     }

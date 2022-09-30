@@ -15,7 +15,7 @@ namespace Umbrella.Core.Tests
 
             var entitiesService = new Mock<IEntitiesService>();
             
-            var service = new CoreService(entitiesService.Object);
+            var service = new RegistrationService(entitiesService.Object);
             await service.RegisterEntityAsync(entity, extensionId);
 
             entitiesService.Verify(s => s.RegisterAsync(It.Is<IEntity>(e => e.Owner == extensionId)));
