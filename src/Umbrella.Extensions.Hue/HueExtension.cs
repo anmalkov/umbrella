@@ -9,7 +9,9 @@ namespace Umbrella.Extensions.Hue;
 
 public class HueExtension : IExtension
 {
-    private const string BridgeIpParameterName = "bridgeIpAddress";
+    private const string BridgeIpParameterName = "bridgeIp";
+    private const string AppKeyParameterName = "appKey";
+    private const string ClientKeyParameterName = "clientKey";
     private const string ApplicationName = "Umbrella";
     private const string DeviceName = "ExtensionHue";
 
@@ -70,6 +72,9 @@ public class HueExtension : IExtension
 
         _hueClient = new HueClient(_httpClient, bridgeIp);
         var regInfo = await _hueClient.RegisterAsync(ApplicationName, DeviceName);
+
+        parameters.Add(AppKeyParameterName, regInfo?.ApplicationKey);
+        parameters.Add(ClientKeyParameterName, regInfo?.ApplicationKey);
 
         var lights = await _hueClient.GetLightsAsync();
         int lightIndex = 1;
