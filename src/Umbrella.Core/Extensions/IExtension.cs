@@ -14,4 +14,5 @@ public interface IExtension
     string HtmlForRegistration { get; }
 
     Task RegisterAsync(Dictionary<string, string?>? parameters);
+    Task UnregisterAsync(Dictionary<string, string?>? parameters);
 }

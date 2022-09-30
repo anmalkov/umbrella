@@ -16,11 +16,9 @@ public sealed class CoreService : ICoreService
         _entitiesService = entitiesService;
     }
 
-    public async Task RegisterEntityAsync(IEntity entity)
+    public async Task RegisterEntityAsync(IEntity entity, string extensionId)
     {
+        entity.Owner = extensionId;
         await _entitiesService.RegisterAsync(entity);
     }
-    
-    
 }
-

@@ -66,10 +66,10 @@ body {
 h1.swimlane {
     background-color: var(--swimlane-background);
     border-radius: 4px;
-    padding: 0.3em 0.6em;
-    font-size: 1em;
+    box-shadow: 0px 1px 1px var(--super-dark);
+    padding: 0.4em 0.8em;
+    font-size: 1.3em;
     font-weight: normal;
-    text-transform: uppercase;
 }
 
 .alert-danger {

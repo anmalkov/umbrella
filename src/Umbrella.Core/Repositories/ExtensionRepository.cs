@@ -26,30 +26,53 @@ public class ExtensionRepository : IExtensionRepository
         return _extensions?.Values.ToList();
     }
 
+    public async Task<Extension?> GetAsync(string id)
+    {
+        await LoadAsync();
+        return _extensions is not null && _extensions.ContainsKey(id) ? _extensions[id] : null;
+    }
+
     public async Task AddAsync(Extension extension)
     {
         await LoadAsync();
 
-        if (_extensions is null)
-        {
-            _extensions = new ConcurrentDictionary<string, Extension>();
-        }
-
-        _extensions.TryAdd(extension.Id, extension);
+        _extensions!.TryAdd(extension.Id, extension);
 
         await SaveAsync();
+    }
+
+    public async Task DeleteAync(string id)
+    {
+        await LoadAsync();
+
+        if (_extensions!.ContainsKey(id))
+        {
+            _extensions.TryRemove(id, out _);
+            await SaveAsync();
+        }
     }
 
 
     private async Task LoadAsync()
     {
-        if (_extensions is not null || !File.Exists(_repositoryFullFilename))
+        if (_extensions is not null)
         {
+            return;
+        }
+
+        if (!File.Exists(_repositoryFullFilename))
+        {
+            _extensions = new ConcurrentDictionary<string, Extension>();
             return;
         }
 
         var json = await File.ReadAllTextAsync(_repositoryFullFilename);
         _extensions = JsonSerializer.Deserialize<ConcurrentDictionary<string, Extension>>(json);
+
+        if (_extensions is null)
+        {
+            _extensions = new ConcurrentDictionary<string, Extension>();
+        }
     }
 
     private async Task SaveAsync()

@@ -19,7 +19,7 @@
     {
         @foreach (var extension in Model.Extensions.Where(e => e.Registered))
         {
-            <div class="col-3">
+            <div class="col-lg-3 col-md-6 col-sm-12">
                 <div class="card widget">
                     <div class="card-body">
                         <h5 class="card-title">@extension.DisplayName</h5>
@@ -27,7 +27,10 @@
                         {
                             <p class="card-text"><a href="/Entities">Show @extension.EntitiesCount entities</a></p>
                         }
-                        <button type="button" class="btn btn-secondary btn-sm">Unregister</button>
+                        <form method="post">
+                            <input type="hidden" name="extension-id" value="@extension.Id" />
+                            <button type="submit" class="btn btn-secondary btn-sm" asp-page-handler="Unregister">Unregister</button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -50,7 +53,7 @@
     {
         @foreach (var extension in Model.Extensions.Where(e => !e.Registered))
         {
-            <div class="col-3">
+            <div class="col-lg-3 col-md-6 col-sm-12">
                 <div class="card widget">
                     <div class="card-body">
                         <h5 class="card-title">@extension.DisplayName</h5>
@@ -72,7 +75,7 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-primary btn-sm">Register</button>
+                                <button type="submit" class="btn btn-primary btn-sm" asp-page-handler="Register">Register</button>
                             </div>
                         </form>
                     </div>

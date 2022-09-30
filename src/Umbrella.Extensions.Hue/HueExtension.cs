@@ -46,6 +46,7 @@ public class HueExtension : IExtension
         }
         _coreService = coreService;
     }
+    
 
     public HueExtension(ICoreService coreService, HttpClient? httpClient, IHueClient hueClient)
         : this(coreService, httpClient)
@@ -53,6 +54,7 @@ public class HueExtension : IExtension
         _hueClient = hueClient;
     }
 
+    
     public async Task RegisterAsync(Dictionary<string, string?>? parameters)
     {
         if (parameters is null || !parameters.ContainsKey(BridgeIpParameterName))
@@ -74,16 +76,21 @@ public class HueExtension : IExtension
         foreach (var light in lights)
         {
             var entity = MapLightToEntity(light, lightIndex++);
-            await _coreService.RegisterEntityAsync(entity);
+            await _coreService.RegisterEntityAsync(entity, Id);
         }
     }
 
+    public Task UnregisterAsync(Dictionary<string, string?>? parameters)
+    {
+        return Task.CompletedTask;
+    }
+
+    
     private LightEntity MapLightToEntity(PhilipsHueLight light, int index)
     {
         return new LightEntity(GenerateEntityId(light, index))
         {
             Name = light.Metadata?.Name ?? $"Light {index}",
-            Owner = Id,
             Available = true,
             Enabled = true,
             MinColorTemperature = 153,
@@ -98,4 +105,5 @@ public class HueExtension : IExtension
         
         return $"light.{Id}.{name}";
     }
+
 }

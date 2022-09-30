@@ -14,4 +14,9 @@ public class XiaomiExtension : IExtension
     {
         throw new NotImplementedException();
     }
+
+    public Task UnregisterAsync(Dictionary<string, string?>? parameters)
+    {
+        throw new NotImplementedException();
+    }
 }

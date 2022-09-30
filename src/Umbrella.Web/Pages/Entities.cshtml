@@ -4,6 +4,12 @@
 	ViewData["Title"] = "Entities";
 }
 
+@if (Model.Entities is null || !Model.Entities.Any())
+{
+	<p>There are no entities registered yet</p>
+	return;
+}
+
 <table class="table">
   <thead>
     <tr>

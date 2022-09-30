@@ -5,5 +5,5 @@ namespace Umbrella.Core.Services;
 
 public interface ICoreService
 {
-    Task RegisterEntityAsync(IEntity entity);
+    Task RegisterEntityAsync(IEntity entity, string extensionId);
 }

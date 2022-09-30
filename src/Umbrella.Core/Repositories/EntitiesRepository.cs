@@ -30,24 +30,28 @@ public sealed class EntitiesRepository : IEntitiesRepository
     public async Task<List<IEntity>?> GetAllAsync()
     {
         await LoadAsync();
+
         return _entities?.Values.ToList();
     }
 
     public async Task<IEntity?> GetAsync(string id)
     {
         await LoadAsync();
+
         return _entities is not null && _entities.ContainsKey(id) ? _entities[id] : null ;
     }
 
     public async Task<List<IEntity>?> GetAsync(EntityType type)
     {
         await LoadAsync();
+
         return _entities?.Values.Where(e => e.Type == type).ToList();
     }
 
     public async Task<int> GetCountAsync(string owner)
     {
         await LoadAsync();
+
         return _entities?.Count(e => e.Value.Owner == owner) ?? 0;
     }
 
@@ -55,12 +59,8 @@ public sealed class EntitiesRepository : IEntitiesRepository
     public async Task AddAsync(IEntity entity)
     {
         await LoadAsync();
-        
-        if (_entities is null) {
-            _entities = new ConcurrentDictionary<string, IEntity>();
-        }
 
-        _entities.TryAdd(entity.Id, entity);
+        _entities!.TryAdd(entity.Id, entity);
         
         await SaveAsync();
     }
@@ -69,14 +69,32 @@ public sealed class EntitiesRepository : IEntitiesRepository
     {
         await LoadAsync();
 
-        if (_entities is null)
-        {
-            _entities = new ConcurrentDictionary<string, IEntity>();
-        }
-
         foreach (var entity in entities)
         {
-            _entities.TryAdd(entity.Id, entity);
+            _entities!.TryAdd(entity.Id, entity);
+        }
+
+        await SaveAsync();
+    }
+    
+    public async Task DeleteAsync(string id)
+    {
+        await LoadAsync();
+
+        if (_entities!.ContainsKey(id))
+        {
+            _entities!.TryRemove(id, out _);
+            await SaveAsync();
+        }
+    }
+
+    public async Task DeleteByOwnerAsync(string owner)
+    {
+        await LoadAsync();
+
+        foreach (var id in _entities!.Where(e => e.Value.Owner == owner).Select(e => e.Key))
+        {
+            _entities!.TryRemove(id, out _);
         }
 
         await SaveAsync();
@@ -85,14 +103,19 @@ public sealed class EntitiesRepository : IEntitiesRepository
 
     private async Task LoadAsync()
     {
-        if (_entities is not null || !File.Exists(_repositoryFullFilename))
+        if (_entities is not null)
+        {
+            return;
+        }
+
+        _entities = new ConcurrentDictionary<string, IEntity>();
+
+        if (!File.Exists(_repositoryFullFilename))
         {
             return;
         }
 
         var json = await File.ReadAllTextAsync(_repositoryFullFilename);
-        
-        _entities = new ConcurrentDictionary<string, IEntity>();
 
         var offset = 0;
         while (true) { 
@@ -149,5 +172,4 @@ public sealed class EntitiesRepository : IEntitiesRepository
         json.Append(']');
         await File.WriteAllTextAsync(_repositoryFullFilename, json.ToString());
     }
-
 }

@@ -15,13 +15,8 @@ public sealed class EntitiesService : IEntitiesService
     {
         _entitiesRepository = entitiesRepository;
     }
+
         
-
-    public Task DeleteAsync(string id)
-    {
-        throw new NotImplementedException();
-    }
-
     public async Task<List<IEntity>?> GetAsync(EntityType type)
     {
         return await _entitiesRepository.GetAsync(type);
@@ -37,6 +32,12 @@ public sealed class EntitiesService : IEntitiesService
         return await _entitiesRepository.GetAsync(id);
     }
 
+    public async Task<int> GetCount(string owner)
+    {
+        return await _entitiesRepository.GetCountAsync(owner);
+    }
+
+    
     public async Task RegisterAsync(IEntity entity)
     {
         if (await _entitiesRepository.GetAsync(entity.Id) is not null)
@@ -51,8 +52,13 @@ public sealed class EntitiesService : IEntitiesService
         throw new NotImplementedException();
     }
 
-    public async Task<int> GetCount(string owner)
+    public async Task DeleteAsync(string id)
     {
-        return await _entitiesRepository.GetCountAsync(owner);
+        await _entitiesRepository.DeleteAsync(id);
+    }
+
+    public async Task DeleteByOwnerAsync(string owner)
+    {
+        await _entitiesRepository.DeleteByOwnerAsync(owner);
     }
 }

@@ -27,7 +27,7 @@ namespace Umbrella.Web.Pages
         public async Task OnGetAsync(string? error)
         {
             Error = error;
-            var registeredExtensions = await _extensionsService.GetAllRegisteredAsync();
+            var registeredExtensions = await _extensionsService.GetRegisteredAsync();
 			Extensions = new List<Extension>();
             foreach (var extension in _extensions)
             {
@@ -45,7 +45,7 @@ namespace Umbrella.Web.Pages
 			}
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPostRegisterAsync()
         {
             var extensionId = Request.Form["extension-id"];
             var parameters = Request.Form.Where(p => !p.Key.StartsWith("__") && p.Key != "extension-id").ToDictionary(p => p.Key, p => p.Value.FirstOrDefault());
@@ -65,6 +65,28 @@ namespace Umbrella.Web.Pages
                 return RedirectToPage("Extensions", new { error = ex.Message });
             }
             
+            return RedirectToPage("Extensions");
+        }
+
+        public async Task<IActionResult> OnPostUnregisterAsync()
+        {
+            var extensionId = Request.Form["extension-id"];
+            var extension = _extensions.FirstOrDefault(e => e.Id == extensionId);
+
+            if (extension is null)
+            {
+                return RedirectToPage("Extensions", new { error = $"Extension {extensionId} is not found" });
+            }
+
+            try
+            {
+                await _extensionsService.UnregisterAsync(extension);
+            }
+            catch (Exception ex)
+            {
+                return RedirectToPage("Extensions", new { error = ex.Message });
+            }
+
             return RedirectToPage("Extensions");
         }
     }

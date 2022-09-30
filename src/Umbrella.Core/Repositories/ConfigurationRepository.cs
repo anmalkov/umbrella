@@ -1,4 +1,6 @@
-﻿namespace Umbrella.Core.Repositories;
+﻿using System.Reflection;
+
+namespace Umbrella.Core.Repositories;
 
 public class ConfigurationRepository : IConfigurationRepository
 {
@@ -6,6 +8,7 @@ public class ConfigurationRepository : IConfigurationRepository
 
     public ConfigurationRepository()
     {
-        RepositoriesDirectory = "./data";
+        var currentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".";
+        RepositoriesDirectory = Path.Combine(currentDirectory, "data");
     }
 }

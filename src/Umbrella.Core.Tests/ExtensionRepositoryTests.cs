@@ -66,5 +66,40 @@ namespace Umbrella.Core.Tests
                 Assert.Equivalent(extension, loadedExtension);
             }
         }
+
+        [Fact]
+        public async Task Delete_removes_the_extension()
+        {
+            var path = "./unit-tests";
+            var fullFilename = Path.Combine(path, RepositoryFilename);
+
+            var extensions = new List<Extension>
+            {
+                new Extension("ex1", new Dictionary<string, string?> { { "param1", "value1" }, { "param2", "value2" } }),
+                new Extension("ex2", new Dictionary<string, string?> { { "param3", "value3" }, { "param4", "value4" } }),
+            };
+
+            if (File.Exists(fullFilename))
+            {
+                File.Delete(fullFilename);
+            }
+
+            var config = new Mock<IConfigurationRepository>();
+            config.SetupGet(x => x.RepositoriesDirectory).Returns(path);
+
+            var repository = new ExtensionRepository(config.Object);
+            foreach (var extension in extensions)
+            {
+                await repository.AddAsync(extension);
+            }
+
+            await repository.DeleteAync("ex1");
+
+            var loadedExtensions = await repository.GetAllAsync();
+
+            Assert.NotNull(loadedExtensions);
+            Assert.Single(loadedExtensions!);
+            Assert.Equivalent(extensions[1], loadedExtensions![0]);
+        }
     }
 }

@@ -12,8 +12,11 @@ public interface IEntitiesRepository
     Task<List<IEntity>?> GetAllAsync();
     Task<IEntity?> GetAsync(string id);
     Task<List<IEntity>?> GetAsync(EntityType type);
+    Task<int> GetCountAsync(string owner);
 
     Task AddAsync(IEntity entity);
     Task AddAsync(List<IEntity> entities);
-    Task<int> GetCountAsync(string owner);
+    
+    Task DeleteAsync(string id);
+    Task DeleteByOwnerAsync(string owner);
 }
