@@ -15,4 +15,7 @@ public interface IExtension
 
     Task RegisterAsync(Dictionary<string, string?>? parameters);
     Task UnregisterAsync(Dictionary<string, string?>? parameters);
+
+    Task StartAsync(Dictionary<string, string?>? parameters);
+    Task StopAsync();
 }

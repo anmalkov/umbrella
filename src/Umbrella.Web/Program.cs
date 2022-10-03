@@ -13,11 +13,13 @@ builder.Services.AddRazorPages();
 builder.Services.AddTransient<IExtension, HueExtension>();
 builder.Services.AddTransient<IExtension, XiaomiExtension>();
 
-builder.Services.AddScoped<IExtensionsService, ExtensionsService>();
+builder.Services.AddSingleton<IEventsService, EventsService>();
+builder.Services.AddSingleton<ICoreService, CoreService>();
+builder.Services.AddSingleton<IExtensionsService, ExtensionsService>();
 builder.Services.AddSingleton<IExtensionRepository, ExtensionRepository>();
 builder.Services.AddSingleton<IConfigurationRepository, ConfigurationRepository>();
-builder.Services.AddScoped<IRegistrationService, RegistrationService>();
-builder.Services.AddScoped<IEntitiesService, EntitiesService>();
+builder.Services.AddSingleton<IRegistrationService, RegistrationService>();
+builder.Services.AddSingleton<IEntitiesService, EntitiesService>();
 builder.Services.AddSingleton<IEntitiesRepository, EntitiesRepository>();
 
 var app = builder.Build();
@@ -39,4 +41,9 @@ app.UseAuthorization();
 
 app.MapRazorPages();
 
+var coreService = app.Services.GetService<ICoreService>();
+await coreService!.StartAsync();
+
 app.Run();
+
+await coreService!.StopAsync();

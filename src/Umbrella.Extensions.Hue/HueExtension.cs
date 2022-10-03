@@ -31,6 +31,7 @@ public class HueExtension : IExtension
   </div>
   <p><b>NOTE:</b> Please make sure that you press the button on your Philips Hue Hub before you press 'Register' button below</p>";
 
+    
     public HueExtension(IRegistrationService coreService) : this (coreService, null) { }
 
     public HueExtension(IRegistrationService coreService, HttpClient? httpClient)
@@ -89,8 +90,18 @@ public class HueExtension : IExtension
     {
         return Task.CompletedTask;
     }
-
     
+    public Task StartAsync(Dictionary<string, string?>? parameters)
+    {
+        return Task.CompletedTask;
+    }
+
+    public Task StopAsync()
+    {
+        return Task.CompletedTask;
+    }
+
+
     private LightEntity MapLightToEntity(PhilipsHueLight light, int index)
     {
         return new LightEntity(GenerateEntityId(light, index))

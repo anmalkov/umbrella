@@ -10,7 +10,17 @@ public class XiaomiExtension : IExtension
 
     public string HtmlForRegistration => @"None";
 
-    public Task RegisterAsync(Dictionary<string, string> parameters)
+    public Task RegisterAsync(Dictionary<string, string?>? parameters)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task StartAsync(Dictionary<string, string?>? parameters)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task StopAsync()
     {
         throw new NotImplementedException();
     }
