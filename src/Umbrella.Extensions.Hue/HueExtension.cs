@@ -1,23 +1,31 @@
 ﻿using PhilipsHue.Sdk;
 using PhilipsHue.Sdk.Models;
 using System.Net.Http;
+using System.Text.Json;
+using Umbrella.Core.Events;
 using Umbrella.Core.Extensions;
 using Umbrella.Core.Models;
 using Umbrella.Core.Services;
 
 namespace Umbrella.Extensions.Hue;
 
+internal record LightId(Guid HueId, string EntityId);
+
 public class HueExtension : IExtension
 {
     private const string BridgeIpParameterName = "bridgeIp";
     private const string AppKeyParameterName = "appKey";
     private const string ClientKeyParameterName = "clientKey";
+    private const string LightsIdsParameterName = "ids";
     private const string ApplicationName = "Umbrella";
     private const string DeviceName = "ExtensionHue";
 
     private readonly HttpClient _httpClient;
     private readonly IRegistrationService _coreService;
+    private readonly IEventsService _eventsService;
+
     private IHueClient? _hueClient;
+    private List<LightId> _lightsIds = new();
 
     public string Id => "hue";
     public string DisplayName => "Philips Hue";
@@ -32,9 +40,12 @@ public class HueExtension : IExtension
   <p><b>NOTE:</b> Please make sure that you press the button on your Philips Hue Hub before you press 'Register' button below</p>";
 
     
-    public HueExtension(IRegistrationService coreService) : this (coreService, null) { }
+    public HueExtension(IRegistrationService coreService, IEventsService eventsService) : this (coreService, eventsService, null)
+    {
+        
+    }
 
-    public HueExtension(IRegistrationService coreService, HttpClient? httpClient)
+    public HueExtension(IRegistrationService coreService, IEventsService eventsService, HttpClient? httpClient)
     {
         if (httpClient is null)
         {
@@ -48,11 +59,11 @@ public class HueExtension : IExtension
             _httpClient = httpClient;
         }
         _coreService = coreService;
+        _eventsService = eventsService;
     }
     
-
-    public HueExtension(IRegistrationService coreService, HttpClient? httpClient, IHueClient hueClient)
-        : this(coreService, httpClient)
+    public HueExtension(IRegistrationService coreService, IEventsService eventsService, HttpClient? httpClient, IHueClient hueClient)
+        : this(coreService, eventsService, httpClient)
     {
         _hueClient = hueClient;
     }
@@ -79,11 +90,15 @@ public class HueExtension : IExtension
 
         var lights = await _hueClient.GetLightsAsync();
         int lightIndex = 1;
+        var lightsIds = new List<LightId>();
         foreach (var light in lights)
         {
             var entity = MapLightToEntity(light, lightIndex++);
             await _coreService.RegisterEntityAsync(entity, Id);
+            lightsIds.Add(new LightId(light.Id, entity.Id));
         }
+
+        parameters.Add(LightsIdsParameterName, JsonSerializer.Serialize(lightsIds));
     }
 
     public Task UnregisterAsync(Dictionary<string, string?>? parameters)
@@ -93,11 +108,42 @@ public class HueExtension : IExtension
     
     public Task StartAsync(Dictionary<string, string?>? parameters)
     {
+        if (parameters is not null && parameters.ContainsKey(BridgeIpParameterName)) {
+            var bridgeIp = parameters[BridgeIpParameterName];
+            var appKey = parameters.ContainsKey(BridgeIpParameterName) ? parameters[AppKeyParameterName] : null;
+            if (!string.IsNullOrWhiteSpace(bridgeIp))
+            {
+                _hueClient = new HueClient(_httpClient, bridgeIp, appKey);
+            }
+        }
+        if (parameters is not null && parameters.ContainsKey(LightsIdsParameterName))
+        {
+            _lightsIds = JsonSerializer.Deserialize<List<LightId>>(parameters?[LightsIdsParameterName] ?? "") ?? new List<LightId>();
+        }
+        
+        _eventsService.Subscribe(EventNames.LightChangeState, OnLightChangeState);
+
         return Task.CompletedTask;
+    }
+
+    private void OnLightChangeState(IEvent? payload)
+    {
+        if (payload is null || payload is not LightChangeStateEvent lightChangeStateEvent)
+        {
+            return;
+        }
+
+        var lightId = _lightsIds.FirstOrDefault(l => l.EntityId == lightChangeStateEvent.EntityId);
+        if (lightId is null)
+        {
+            return;
+        }
+        var _ = (_hueClient!.UpdateLightAsync(lightId.HueId, new PhilipsHueUpdateLight { On = new() { TurnedOn = lightChangeStateEvent.TurnedOn } })).Result;
     }
 
     public Task StopAsync()
     {
+        _eventsService.Unsubscribe(EventNames.LightChangeState, OnLightChangeState);
         return Task.CompletedTask;
     }
 

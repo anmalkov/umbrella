@@ -23,14 +23,16 @@ public class HueClient : IHueClient
     private bool BridgeRegistered => !string.IsNullOrEmpty(_appKey);
 
 
-    public HueClient(HttpClient httpClient, string ip)
+    public HueClient(HttpClient httpClient, string ip, string? appKey = null)
     {
         if (string.IsNullOrWhiteSpace(ip)) throw new ArgumentNullException(nameof(ip));
 
         _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+        
         _ip = ip;
+        _appKey = appKey;
     }
-    
+
 
     public async Task<PhilipsHueRegistrationInfo?> RegisterAsync(string applicationName, string deviceName)
     {
@@ -113,6 +115,7 @@ public class HueClient : IHueClient
 
     public async Task<IEnumerable<PhilipsHueLight>> GetLightsAsync()
     {
+        _httpClient.DefaultRequestHeaders.Remove("hue-application-key");
         _httpClient.DefaultRequestHeaders.Add("hue-application-key", _appKey);
         
         var response = await _httpClient.GetAsync(GetUri(ResourceType.Light));
@@ -124,5 +127,26 @@ public class HueClient : IHueClient
         var philipsHueResponse = await response.Content.ReadFromJsonAsync<PhilipsHueResponse<PhilipsHueLight>>();
 
         return philipsHueResponse is not null ? philipsHueResponse.Data : new();
+    }
+
+    public async Task<PhilipsHuePutResponse> UpdateLightAsync(Guid id, PhilipsHueUpdateLight data)
+    {
+        _httpClient.DefaultRequestHeaders.Remove("hue-application-key");
+        _httpClient.DefaultRequestHeaders.Add("hue-application-key", _appKey);
+
+        JsonSerializerOptions options = new()
+        {
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+        };
+        var response = await _httpClient.PutAsJsonAsync(GetUri(ResourceType.Light, id), data, options);
+        if (!response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            throw new PhilipsHueException($"Response from the bridge has unexpected HTTP status code: {response.StatusCode}");
+        }
+        
+        var philipsHueResponse = await response.Content.ReadFromJsonAsync<PhilipsHuePutResponse>();
+
+        return philipsHueResponse is not null ? philipsHueResponse : new();
     }
 }

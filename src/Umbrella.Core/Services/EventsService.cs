@@ -12,7 +12,7 @@ public sealed class EventsService : IEventsService
         
     }
 
-    public void PublishAsync(string eventName, IEvent? data)
+    public void Publish(string eventName, IEvent? data)
     {
         if (!_subscriptions.ContainsKey(eventName) || _subscriptions[eventName] is null)
         {
@@ -30,6 +30,7 @@ public sealed class EventsService : IEventsService
     {
         if (!_subscriptions.ContainsKey(eventName))
         {
+            _subscriptions.TryAdd(eventName, new List<Action<IEvent?>> { eventHandler });
             return;
         }
 

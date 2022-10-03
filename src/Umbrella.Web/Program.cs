@@ -10,8 +10,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 //builder.Services.AddHttpClient();
 
-builder.Services.AddTransient<IExtension, HueExtension>();
-builder.Services.AddTransient<IExtension, XiaomiExtension>();
+builder.Services.AddSingleton<IExtension, HueExtension>();
+builder.Services.AddSingleton<IExtension, XiaomiExtension>();
 
 builder.Services.AddSingleton<IEventsService, EventsService>();
 builder.Services.AddSingleton<ICoreService, CoreService>();
