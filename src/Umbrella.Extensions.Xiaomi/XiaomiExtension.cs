@@ -5,10 +5,10 @@ namespace Umbrella.Extensions.Xiaomi;
 public class XiaomiExtension : IExtension
 {
     public string Id => "mi";
-    public string DisplayName => "Xiaomi";
-    public string Image => "";
+    public string? DisplayName => "Xiaomi";
+    public string? Image => "";
 
-    public string HtmlForRegistration => @"None";
+    public string? HtmlForRegistration => @"None";
 
     public Task RegisterAsync(Dictionary<string, string?>? parameters)
     {

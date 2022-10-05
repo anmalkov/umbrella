@@ -8,12 +8,12 @@ namespace Umbrella.Web.Pages
 {
     public class ExtensionsModel : PageModel
     {
-        public record Extension (string Id, string DisplayName, string Image, string HtmlForRegistration, bool Registered, int EntitiesCount);
+        public record ExtensionViewModel (string Id, string? DisplayName, string? Image, string? HtmlForRegistration, bool Registered, int EntitiesCount);
         
         private readonly IExtensionsService _extensionsService;
         private readonly IEntitiesService _entitiesService;
 
-        public List<Extension> Extensions { get; private set; }
+        public List<ExtensionViewModel>? Extensions { get; private set; } = null;
         public string? Error { get; private set; }
 
         public ExtensionsModel(IExtensionsService extensionsService, IEntitiesService entitiesService)
@@ -26,12 +26,12 @@ namespace Umbrella.Web.Pages
         {
             Error = error;
             var registeredExtensions = await _extensionsService.GetRegisteredAsync();
-			Extensions = new List<Extension>();
+			Extensions = new List<ExtensionViewModel>();
             foreach (var extension in await _extensionsService.GetAllAsync())
             {
                 var registered = registeredExtensions.Any(r => r.Id == extension.Id);
                 var entitiesCount = registered ? await _entitiesService.GetCount(extension.Id) : 0;
-                Extensions.Add(new Extension(
+                Extensions.Add(new ExtensionViewModel(
                     extension.Id,
                     extension.DisplayName,
                     extension.Image,
@@ -46,17 +46,15 @@ namespace Umbrella.Web.Pages
         public async Task<IActionResult> OnPostRegisterAsync()
         {
             var extensionId = Request.Form["extension-id"];
-            var parameters = Request.Form.Where(p => !p.Key.StartsWith("__") && p.Key != "extension-id").ToDictionary(p => p.Key, p => p.Value.FirstOrDefault());
-            var extension = (await _extensionsService.GetAllAsync()).FirstOrDefault(e => e.Id == extensionId);
-
-            if (extension is null)
+            if (string.IsNullOrWhiteSpace(extensionId))
             {
-                return RedirectToPage("Extensions", new { error = $"Extension {extensionId} is not found" });
+                return RedirectToPage("Extensions", new { error = $"Select an extension to register" });
             }
+            var parameters = Request.Form.Where(p => !p.Key.StartsWith("__") && p.Key != "extension-id").ToDictionary(p => p.Key, p => p.Value.FirstOrDefault());
             
             try
             {
-                await _extensionsService.RegisterAsync(extension, parameters);
+                await _extensionsService.RegisterAsync(extensionId!, parameters);
             }
             catch (Exception ex)
             {
@@ -69,16 +67,14 @@ namespace Umbrella.Web.Pages
         public async Task<IActionResult> OnPostUnregisterAsync()
         {
             var extensionId = Request.Form["extension-id"];
-            var extension = (await _extensionsService.GetAllAsync()).FirstOrDefault(e => e.Id == extensionId);
-
-            if (extension is null)
+            if (string.IsNullOrWhiteSpace(extensionId))
             {
-                return RedirectToPage("Extensions", new { error = $"Extension {extensionId} is not found" });
+                return RedirectToPage("Extensions", new { error = $"Select an extension to unregister" });
             }
 
             try
             {
-                await _extensionsService.UnregisterAsync(extension);
+                await _extensionsService.UnregisterAsync(extensionId!);
             }
             catch (Exception ex)
             {

@@ -2,22 +2,23 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Umbrella.Core.Extensions;
 
 namespace Umbrella.Core.Models;
 
-public class RegisteredExtension
+public class Extension
 {
     public string Id { get; init; }
-    public Dictionary<string, string?>? Parameters { get; set; }
 
-    [JsonConstructor]
-    public RegisteredExtension(string id): this(id, null) { }
+    public string? DisplayName { get; set; }
 
-    public RegisteredExtension(string id, Dictionary<string, string?>? parameters)
+    public string? Image { get; set; }
+
+    public string? HtmlForRegistration { get; set; }
+
+    public Extension(string id)
     {
         Id = id;
-        Parameters = parameters;
     }
 }

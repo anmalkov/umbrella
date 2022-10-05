@@ -28,10 +28,10 @@ public class HueExtension : IExtension
     private List<LightId> _lightsIds = new();
 
     public string Id => "hue";
-    public string DisplayName => "Philips Hue";
-    public string Image => "";
+    public string? DisplayName => "Philips Hue";
+    public string? Image => "";
 
-    public string HtmlForRegistration => @"
+    public string? HtmlForRegistration => @"
   <div class=""mb-3"">
     <label for=""" + BridgeIpParameterName + @""" class=""form-label"">Hue bridge IP address</label>
     <input type=""text"" class=""form-control"" name=""" + BridgeIpParameterName + @""" aria-describedby=""hubIpAddressHelp"">

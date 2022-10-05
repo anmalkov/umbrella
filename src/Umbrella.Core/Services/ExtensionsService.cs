@@ -17,9 +17,14 @@ public class ExtensionsService : IExtensionsService
         _extensions = extensions;
     }
 
-    public Task<IEnumerable<IExtension>> GetAllAsync()
+    public Task<IEnumerable<Extension>> GetAllAsync()
     {
-        return Task.FromResult(_extensions);
+        return Task.FromResult(_extensions.Select(e => new Extension(e.Id)
+        {
+            DisplayName = e.DisplayName,
+            HtmlForRegistration = e.HtmlForRegistration,
+            Image = e.Image
+        }));
     }
 
     public async Task<IEnumerable<RegisteredExtension>> GetRegisteredAsync()
@@ -27,14 +32,26 @@ public class ExtensionsService : IExtensionsService
         return await _extensionRepository.GetAllAsync() ?? new List<RegisteredExtension>();
     }    
 
-    public async Task RegisterAsync(IExtension extension, Dictionary<string, string?>? parameters)
+    public async Task RegisterAsync(string id, Dictionary<string, string?>? parameters)
     {
+        var extension = _extensions.FirstOrDefault(e => e.Id == id);
+        if (extension is null)
+        {
+            return;
+        }
+        
         await extension.RegisterAsync(parameters);
         await _extensionRepository.AddAsync(new RegisteredExtension(extension.Id, parameters));
     }
 
-    public async Task UnregisterAsync(IExtension extension)
+    public async Task UnregisterAsync(string id)
     {
+        var extension = _extensions.FirstOrDefault(e => e.Id == id);
+        if (extension is null)
+        {
+            return;
+        }
+
         var registeredExtension = await _extensionRepository.GetAsync(extension.Id);
         if (registeredExtension is null)
         {

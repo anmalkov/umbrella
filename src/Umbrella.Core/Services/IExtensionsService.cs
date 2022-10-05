@@ -10,8 +10,8 @@ namespace Umbrella.Core.Services;
 
 public interface IExtensionsService
 {
-    Task RegisterAsync(IExtension extension, Dictionary<string, string?>? parameters);
-    Task UnregisterAsync(IExtension extension);
+    Task RegisterAsync(string id, Dictionary<string, string?>? parameters);
+    Task UnregisterAsync(string id);
     Task<IEnumerable<RegisteredExtension>> GetRegisteredAsync();
-    Task<IEnumerable<IExtension>> GetAllAsync();
+    Task<IEnumerable<Extension>> GetAllAsync();
 }
