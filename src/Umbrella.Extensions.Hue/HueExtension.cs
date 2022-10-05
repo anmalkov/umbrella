@@ -106,7 +106,7 @@ public class HueExtension : IExtension
         return Task.CompletedTask;
     }
     
-    public Task StartAsync(Dictionary<string, string?>? parameters)
+    public async Task StartAsync(Dictionary<string, string?>? parameters)
     {
         if (parameters is not null && parameters.ContainsKey(BridgeIpParameterName)) {
             var bridgeIp = parameters[BridgeIpParameterName];
@@ -121,9 +121,32 @@ public class HueExtension : IExtension
             _lightsIds = JsonSerializer.Deserialize<List<LightId>>(parameters?[LightsIdsParameterName] ?? "") ?? new List<LightId>();
         }
         
+        await ReportCurrentStateForLightsAsync();
+        
         _eventsService.Subscribe(EventNames.LightChangeState, OnLightChangeState);
+    }
 
-        return Task.CompletedTask;
+    private async Task ReportCurrentStateForLightsAsync()
+    {
+        if (_hueClient is null || !_lightsIds.Any())
+        {
+            return;
+        }
+        
+        var lights = await _hueClient.GetLightsAsync();
+        foreach (var lightId in _lightsIds)
+        {
+            var light = lights.FirstOrDefault(l => l.Id == lightId.HueId);
+            if (light is null)
+            {
+                continue;
+            }
+            _eventsService.Publish(EventNames.LightStateChanged, new LightChangeStateEvent(lightId.EntityId, light.On?.TurnedOn)
+            {
+                Brightness = (byte?)light.Dimming?.Brightness,
+                ColorTemperature = light.ColorTemperature?.Mirek
+            });
+        }
     }
 
     private void OnLightChangeState(IEvent? payload)

@@ -17,5 +17,4 @@ public interface IEntitiesService
     Task<List<IEntity>?> GetAllAsync();
     Task<List<IEntity>?> GetAsync(EntityType type);
 	Task<int> GetCount(string owner);
-    
 }

@@ -3,7 +3,14 @@
 public sealed class LightStateChangedEvent : IEvent
 {
     public string EventName => EventNames.LightStateChanged;
-    public bool TurnedOn { get; private set; }
-    public byte Brightness { get; private set; }
-    public int ColorTemperature { get; private set; }
+    public string EntityId { get; init; }
+    public bool? TurnedOn { get; private set; }
+    public byte? Brightness { get; private set; }
+    public int? ColorTemperature { get; private set; }
+
+    public LightStateChangedEvent(string entityId, bool? turnedOn = null)
+    {
+        EntityId = entityId;
+        TurnedOn = turnedOn;
+    }
 }
