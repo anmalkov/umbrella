@@ -8,5 +8,5 @@ namespace Umbrella.Core.Events;
 
 public interface IEvent
 {
-    string EventName { get; }
+    string Name { get; }
 }

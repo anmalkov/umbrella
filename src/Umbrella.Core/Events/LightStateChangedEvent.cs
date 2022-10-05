@@ -2,7 +2,7 @@
 
 public sealed class LightStateChangedEvent : IEvent
 {
-    public string EventName => EventNames.LightStateChanged;
+    public string Name => EventNames.LightStateChanged;
     public string EntityId { get; init; }
     public bool? TurnedOn { get; private set; }
     public byte? Brightness { get; private set; }

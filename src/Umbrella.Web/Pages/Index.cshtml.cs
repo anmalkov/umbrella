@@ -25,7 +25,7 @@ namespace Umbrella.Web.Pages
         {
             bool turnedOn = Request.Form["testLightTurnedOn"] == "on";
             byte.TryParse(Request.Form["testLightBrightness"], out byte brightness);
-            _eventsService.Publish(EventNames.LightChangeState, new LightChangeStateEvent("light.hue.test", turnedOn) { Brightness = brightness });
+            _eventsService.Publish(new LightChangeStateEvent("light.hue.test", turnedOn) { Brightness = brightness });
         }
     }
 }

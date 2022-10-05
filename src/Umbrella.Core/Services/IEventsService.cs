@@ -12,5 +12,5 @@ public interface IEventsService
     void Subscribe(string eventName, Action<IEvent?> eventHandler);
     void Unsubscribe(string eventName, Action<IEvent?> eventHandler);
 
-    void Publish(string eventName, IEvent? data);
+    void Publish(IEvent @event);
 }

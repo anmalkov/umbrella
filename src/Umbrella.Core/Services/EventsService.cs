@@ -12,17 +12,17 @@ public sealed class EventsService : IEventsService
         
     }
 
-    public void Publish(string eventName, IEvent? data)
+    public void Publish(IEvent @event)
     {
-        if (!_subscriptions.ContainsKey(eventName) || _subscriptions[eventName] is null)
+        if (!_subscriptions.ContainsKey(@event.Name) || _subscriptions[@event.Name] is null)
         {
             return;
         }
         
-        var actions = _subscriptions[eventName];
+        var actions = _subscriptions[@event.Name];
         foreach ( var action in actions)
         {
-            action.Invoke(data);
+            action.Invoke(@event);
         }
     }
 

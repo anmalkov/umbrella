@@ -141,7 +141,7 @@ public class HueExtension : IExtension
             {
                 continue;
             }
-            _eventsService.Publish(EventNames.LightStateChanged, new LightChangeStateEvent(lightId.EntityId, light.On?.TurnedOn)
+            _eventsService.Publish(new LightChangeStateEvent(lightId.EntityId, light.On?.TurnedOn)
             {
                 Brightness = (byte?)light.Dimming?.Brightness,
                 ColorTemperature = light.ColorTemperature?.Mirek
