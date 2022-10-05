@@ -8,22 +8,29 @@ public class ExtensionsService : IExtensionsService
 {
     private readonly IExtensionRepository _extensionRepository;
     private readonly IEntitiesService _entitiesService;
+    private readonly IEnumerable<IExtension> _extensions;
 
-    public ExtensionsService(IExtensionRepository extensionRepository, IEntitiesService entitiesService)
+    public ExtensionsService(IExtensionRepository extensionRepository, IEntitiesService entitiesService, IEnumerable<IExtension> extensions)
     {
         _extensionRepository = extensionRepository;
         _entitiesService = entitiesService;
+        _extensions = extensions;
     }
 
-    public async Task<List<Extension>> GetRegisteredAsync()
+    public Task<IEnumerable<IExtension>> GetAllAsync()
     {
-        return await _extensionRepository.GetAllAsync() ?? new List<Extension>();
+        return Task.FromResult(_extensions);
     }
+
+    public async Task<IEnumerable<RegisteredExtension>> GetRegisteredAsync()
+    {
+        return await _extensionRepository.GetAllAsync() ?? new List<RegisteredExtension>();
+    }    
 
     public async Task RegisterAsync(IExtension extension, Dictionary<string, string?>? parameters)
     {
         await extension.RegisterAsync(parameters);
-        await _extensionRepository.AddAsync(new Extension(extension.Id, parameters));
+        await _extensionRepository.AddAsync(new RegisteredExtension(extension.Id, parameters));
     }
 
     public async Task UnregisterAsync(IExtension extension)

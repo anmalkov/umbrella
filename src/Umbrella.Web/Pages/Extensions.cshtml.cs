@@ -10,16 +10,14 @@ namespace Umbrella.Web.Pages
     {
         public record Extension (string Id, string DisplayName, string Image, string HtmlForRegistration, bool Registered, int EntitiesCount);
         
-        private readonly IEnumerable<IExtension> _extensions;
         private readonly IExtensionsService _extensionsService;
         private readonly IEntitiesService _entitiesService;
 
         public List<Extension> Extensions { get; private set; }
         public string? Error { get; private set; }
 
-        public ExtensionsModel(IEnumerable<IExtension> extensions, IExtensionsService extensionsService, IEntitiesService entitiesService)
+        public ExtensionsModel(IExtensionsService extensionsService, IEntitiesService entitiesService)
         {
-            _extensions = extensions ?? new List<IExtension>();
             _extensionsService = extensionsService;
             _entitiesService = entitiesService;
         }
@@ -29,7 +27,7 @@ namespace Umbrella.Web.Pages
             Error = error;
             var registeredExtensions = await _extensionsService.GetRegisteredAsync();
 			Extensions = new List<Extension>();
-            foreach (var extension in _extensions)
+            foreach (var extension in await _extensionsService.GetAllAsync())
             {
                 var registered = registeredExtensions.Any(r => r.Id == extension.Id);
                 var entitiesCount = registered ? await _entitiesService.GetCount(extension.Id) : 0;
@@ -49,7 +47,7 @@ namespace Umbrella.Web.Pages
         {
             var extensionId = Request.Form["extension-id"];
             var parameters = Request.Form.Where(p => !p.Key.StartsWith("__") && p.Key != "extension-id").ToDictionary(p => p.Key, p => p.Value.FirstOrDefault());
-            var extension = _extensions.FirstOrDefault(e => e.Id == extensionId);
+            var extension = (await _extensionsService.GetAllAsync()).FirstOrDefault(e => e.Id == extensionId);
 
             if (extension is null)
             {
@@ -71,7 +69,7 @@ namespace Umbrella.Web.Pages
         public async Task<IActionResult> OnPostUnregisterAsync()
         {
             var extensionId = Request.Form["extension-id"];
-            var extension = _extensions.FirstOrDefault(e => e.Id == extensionId);
+            var extension = (await _extensionsService.GetAllAsync()).FirstOrDefault(e => e.Id == extensionId);
 
             if (extension is null)
             {

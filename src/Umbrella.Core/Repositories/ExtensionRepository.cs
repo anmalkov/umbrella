@@ -12,7 +12,7 @@ public class ExtensionRepository : IExtensionRepository
 
     private readonly string _repositoryFullFilename;
 
-    private ConcurrentDictionary<string, Extension>? _extensions = null;
+    private ConcurrentDictionary<string, RegisteredExtension>? _extensions = null;
 
 
     public ExtensionRepository(IConfigurationRepository configurationRepository)
@@ -20,19 +20,19 @@ public class ExtensionRepository : IExtensionRepository
         _repositoryFullFilename = Path.Combine(configurationRepository.RepositoriesDirectory, RepositoryFilename);
     }
 
-    public async Task<List<Extension>?> GetAllAsync()
+    public async Task<List<RegisteredExtension>?> GetAllAsync()
     {
         await LoadAsync();
         return _extensions?.Values.ToList();
     }
 
-    public async Task<Extension?> GetAsync(string id)
+    public async Task<RegisteredExtension?> GetAsync(string id)
     {
         await LoadAsync();
         return _extensions is not null && _extensions.ContainsKey(id) ? _extensions[id] : null;
     }
 
-    public async Task AddAsync(Extension extension)
+    public async Task AddAsync(RegisteredExtension extension)
     {
         await LoadAsync();
 
@@ -62,16 +62,16 @@ public class ExtensionRepository : IExtensionRepository
 
         if (!File.Exists(_repositoryFullFilename))
         {
-            _extensions = new ConcurrentDictionary<string, Extension>();
+            _extensions = new ConcurrentDictionary<string, RegisteredExtension>();
             return;
         }
 
         var json = await File.ReadAllTextAsync(_repositoryFullFilename);
-        _extensions = JsonSerializer.Deserialize<ConcurrentDictionary<string, Extension>>(json);
+        _extensions = JsonSerializer.Deserialize<ConcurrentDictionary<string, RegisteredExtension>>(json);
 
         if (_extensions is null)
         {
-            _extensions = new ConcurrentDictionary<string, Extension>();
+            _extensions = new ConcurrentDictionary<string, RegisteredExtension>();
         }
     }
 

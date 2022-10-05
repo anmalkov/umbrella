@@ -12,5 +12,6 @@ public interface IExtensionsService
 {
     Task RegisterAsync(IExtension extension, Dictionary<string, string?>? parameters);
     Task UnregisterAsync(IExtension extension);
-    Task<List<Extension>> GetRegisteredAsync();
+    Task<IEnumerable<RegisteredExtension>> GetRegisteredAsync();
+    Task<IEnumerable<IExtension>> GetAllAsync();
 }

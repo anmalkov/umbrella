@@ -7,15 +7,15 @@ using System.Threading.Tasks;
 
 namespace Umbrella.Core.Models;
 
-public class Extension
+public class RegisteredExtension
 {
     public string Id { get; init; }
     public Dictionary<string, string?>? Parameters { get; set; }
 
     [JsonConstructor]
-    public Extension(string id): this(id, null) { }
+    public RegisteredExtension(string id): this(id, null) { }
 
-    public Extension(string id, Dictionary<string, string?>? parameters)
+    public RegisteredExtension(string id, Dictionary<string, string?>? parameters)
     {
         Id = id;
         Parameters = parameters;

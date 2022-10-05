@@ -13,7 +13,7 @@ namespace Umbrella.Core.Tests
             var path = "./unit-tests";
             var fullFilename = Path.Combine(path, RepositoryFilename);
 
-            var extension = new Extension("ex1");
+            var extension = new RegisteredExtension("ex1");
 
             if (File.Exists(fullFilename))
             {
@@ -35,11 +35,11 @@ namespace Umbrella.Core.Tests
             var path = "./unit-tests";
             var fullFilename = Path.Combine(path, RepositoryFilename);
 
-            var extensions = new List<Extension>
+            var extensions = new List<RegisteredExtension>
             {
-                new Extension("ex1", new Dictionary<string, string?> { { "param1", "value1" }, { "param2", "value2" } }),
-                new Extension("ex2", new Dictionary<string, string?> { { "param3", "value3" }, { "param4", "value4" } }),
-                new Extension("ex3")
+                new RegisteredExtension("ex1", new Dictionary<string, string?> { { "param1", "value1" }, { "param2", "value2" } }),
+                new RegisteredExtension("ex2", new Dictionary<string, string?> { { "param3", "value3" }, { "param4", "value4" } }),
+                new RegisteredExtension("ex3")
             };
 
             if (File.Exists(fullFilename))
@@ -73,10 +73,10 @@ namespace Umbrella.Core.Tests
             var path = "./unit-tests";
             var fullFilename = Path.Combine(path, RepositoryFilename);
 
-            var extensions = new List<Extension>
+            var extensions = new List<RegisteredExtension>
             {
-                new Extension("ex1", new Dictionary<string, string?> { { "param1", "value1" }, { "param2", "value2" } }),
-                new Extension("ex2", new Dictionary<string, string?> { { "param3", "value3" }, { "param4", "value4" } }),
+                new RegisteredExtension("ex1", new Dictionary<string, string?> { { "param1", "value1" }, { "param2", "value2" } }),
+                new RegisteredExtension("ex2", new Dictionary<string, string?> { { "param3", "value3" }, { "param4", "value4" } }),
             };
 
             if (File.Exists(fullFilename))
