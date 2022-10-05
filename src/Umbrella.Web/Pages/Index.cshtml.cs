@@ -21,14 +21,11 @@ namespace Umbrella.Web.Pages
 
         }
 
-        public void OnPostTurnOn()
+        public void OnPostTestLight()
         {
-            _eventsService.Publish(EventNames.LightChangeState, new LightChangeStateEvent("light.hue.test", turnedOn: true));
-        }
-        
-        public void OnPostTurnOff()
-        {
-            _eventsService.Publish(EventNames.LightChangeState, new LightChangeStateEvent("light.hue.test", turnedOn: false));
+            bool turnedOn = Request.Form["testLightTurnedOn"] == "on";
+            byte.TryParse(Request.Form["testLightBrightness"], out byte brightness);
+            _eventsService.Publish(EventNames.LightChangeState, new LightChangeStateEvent("light.hue.test", turnedOn) { Brightness = brightness });
         }
     }
 }

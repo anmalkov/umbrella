@@ -138,7 +138,10 @@ public class HueExtension : IExtension
         {
             return;
         }
-        var _ = (_hueClient!.UpdateLightAsync(lightId.HueId, new PhilipsHueUpdateLight { On = new() { TurnedOn = lightChangeStateEvent.TurnedOn } })).Result;
+        var _ = (_hueClient!.UpdateLightAsync(lightId.HueId, new PhilipsHueUpdateLight { 
+            On = lightChangeStateEvent.TurnedOn is not null ? new() { TurnedOn = lightChangeStateEvent.TurnedOn.Value } : null,
+            Dimming = lightChangeStateEvent.Brightness is not null ? new() { Brightness = lightChangeStateEvent.Brightness.Value } : null
+        })).Result;
     }
 
     public Task StopAsync()

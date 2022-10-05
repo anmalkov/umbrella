@@ -10,10 +10,15 @@
             <div class="card-body">
                 <h5 class="card-title">Light</h5>
 				<form method="post">
-                    <button type="submit" asp-page-handler="TurnOn">On</button>
-                </form>
-                <form method="post">
-                    <button type="submit" asp-page-handler="TurnOff">Off</button>
+                    <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox" name="testLightTurnedOn">
+                        <label class="form-check-label" for="testLightTurnedOn">Test light</label>
+                    </div>
+                    <div class="mb-3">
+                        <label for="testLightBrightness" class="form-label">Brightness</label>
+                        <input type="range" class="form-range" name="testLightBrightness" min="0" max="100">
+					</div>
+                    <button type="submit" asp-page-handler="TestLight">Send</button>
                 </form>
             </div>
         </div>
