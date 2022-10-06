@@ -37,8 +37,8 @@ namespace Umbrella.Core.Tests
 
             var entities = new List<IEntity>
             {
-                new LightEntity("light.test1") { Name = "Light 1", TurnedOn = true, Available = true, Brightness = 100, RgbColor = new(1, 2, 3) },
-                new LightEntity("light.test2") { Name = "Light 2", TurnedOn = false, Available = true, Brightness = 50 }
+                new LightEntity("light.test1") { Name = "Light 1", Available = true, MinColorTemperature = 100, MaxColorTemperature = 5000 },
+                new LightEntity("light.test2") { Name = "Light 2", Available = true, MinColorTemperature = 3000, MaxColorTemperature = 6000 }
             };
 
             if (File.Exists(fullFilename))
@@ -72,8 +72,8 @@ namespace Umbrella.Core.Tests
 
             var entities = new List<IEntity>
             {
-                new LightEntity("light.test1") { Name = "Light 1", TurnedOn = true, Available = true, Brightness = 100 },
-                new LightEntity("light.test2") { Name = "Light 2", TurnedOn = false, Available = true, Brightness = 50 }
+                new LightEntity("light.test1") { Name = "Light 1", MinColorTemperature = 100, MaxColorTemperature = 5000 },
+                new LightEntity("light.test2") { Name = "Light 2", MinColorTemperature = 3000, MaxColorTemperature = 6000 }
             };
 
             if (File.Exists(fullFilename))
@@ -103,8 +103,8 @@ namespace Umbrella.Core.Tests
 
             var entities = new List<IEntity>
             {
-                new LightEntity("light.test1") { Name = "Light 1", TurnedOn = true, Available = true, Brightness = 100 },
-                new LightEntity("light.test2") { Name = "Light 2", TurnedOn = false, Available = true, Brightness = 50 }
+                new LightEntity("light.test1") { Name = "Light 1", MinColorTemperature = 100, MaxColorTemperature = 5000 },
+                new LightEntity("light.test2") { Name = "Light 2", MinColorTemperature = 3000, MaxColorTemperature = 6000 }
             };
 
             if (File.Exists(fullFilename))
@@ -135,12 +135,12 @@ namespace Umbrella.Core.Tests
 
             var entities = new List<IEntity>
             {
-                new LightEntity("light.test1") { Name = "Light 1", TurnedOn = true, Available = true, Brightness = 100, Owner = "another" },
-                new LightEntity("light.test2") { Name = "Light 2", TurnedOn = false, Available = true, Brightness = 50, Owner = "test" },
-                new LightEntity("light.test3") { Name = "Light 3", TurnedOn = true, Available = true, Brightness = 100, Owner = "another" },
-                new LightEntity("light.test4") { Name = "Light 4", TurnedOn = false, Available = true, Brightness = 50, Owner = "test" },
-                new LightEntity("light.test5") { Name = "Light 5", TurnedOn = true, Available = true, Brightness = 100, Owner = "another" },
-                new LightEntity("light.test6") { Name = "Light 6", TurnedOn = false, Available = true, Brightness = 50, Owner = "test" }
+                new LightEntity("light.test1") { Name = "Light 1", MinColorTemperature = 100, MaxColorTemperature = 5000, Owner = "another" },
+                new LightEntity("light.test2") { Name = "Light 2", MinColorTemperature = 200, MaxColorTemperature = 5100, Owner = "test" },
+                new LightEntity("light.test3") { Name = "Light 3", MinColorTemperature = 300, MaxColorTemperature = 5200, Owner = "another" },
+                new LightEntity("light.test4") { Name = "Light 4", MinColorTemperature = 400, MaxColorTemperature = 5300, Owner = "test" },
+                new LightEntity("light.test5") { Name = "Light 5", MinColorTemperature = 500, MaxColorTemperature = 5400, Owner = "another" },
+                new LightEntity("light.test6") { Name = "Light 6", MinColorTemperature = 600, MaxColorTemperature = 5500, Owner = "test" }
             };
 
             if (File.Exists(fullFilename))

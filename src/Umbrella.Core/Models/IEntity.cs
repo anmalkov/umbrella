@@ -12,7 +12,6 @@ public interface IEntity
     string? Name { get; }
     string? Icon { get; }
     string? Owner { get; set; }
-    bool Available { get; }
     bool Enabled { get; }
     EntityType Type { get; }
 }

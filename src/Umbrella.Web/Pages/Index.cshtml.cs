@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Umbrella.Core.Events;
+using Umbrella.Core.Models;
 using Umbrella.Core.Services;
 
 namespace Umbrella.Web.Pages
@@ -25,7 +26,12 @@ namespace Umbrella.Web.Pages
         {
             bool turnedOn = Request.Form["testLightTurnedOn"] == "on";
             byte.TryParse(Request.Form["testLightBrightness"], out byte brightness);
-            _eventsService.Publish(new LightChangeStateEvent("light.hue.test", turnedOn) { Brightness = brightness });
+            var state = new LightEntityState
+            {
+                TurnedOn = turnedOn,
+                Brightness = brightness
+            };
+            _eventsService.Publish(new ChangeEntityStateEvent<LightEntityState>("light.hue.test", state));
         }
     }
 }

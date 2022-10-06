@@ -16,6 +16,7 @@ public static class EventNames
     //public const string ExtensionUnregistered = "ExtensionUnregistered";
     //public const string ExtensionStarted = "ExtensionStarted";
     //public const string ExtensionStopped = "ExtensionStopped";
-    public const string LightChangeState = "light.change_state";
-    public const string LightStateChanged = "light.state_changed";
+
+    public const string ChangeEntityState = "entity.change_state";
+    public const string EntityStateChanged = "entity.state_changed";
 }

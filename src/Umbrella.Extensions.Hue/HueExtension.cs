@@ -123,7 +123,7 @@ public class HueExtension : IExtension
         
         await ReportCurrentStateForLightsAsync();
         
-        _eventsService.Subscribe(EventNames.LightChangeState, OnLightChangeState);
+        _eventsService.Subscribe(EventNames.ChangeEntityState, OnChangeLightState);
     }
 
     private async Task ReportCurrentStateForLightsAsync()
@@ -141,35 +141,38 @@ public class HueExtension : IExtension
             {
                 continue;
             }
-            _eventsService.Publish(new LightChangeStateEvent(lightId.EntityId, light.On?.TurnedOn)
+            var state = new LightEntityState
             {
+                TurnedOn = light.On?.TurnedOn,
                 Brightness = (byte?)light.Dimming?.Brightness,
                 ColorTemperature = light.ColorTemperature?.Mirek
-            });
+            };
+            _eventsService.Publish(new ChangeEntityStateEvent<LightEntityState>(lightId.EntityId, state));
         }
     }
 
-    private void OnLightChangeState(IEvent? payload)
+    private void OnChangeLightState(IEvent? payload)
     {
-        if (payload is null || payload is not LightChangeStateEvent lightChangeStateEvent)
+        if (payload is null || payload is not ChangeEntityStateEvent<LightEntityState> changeEntityStateEvent)
         {
             return;
         }
 
-        var lightId = _lightsIds.FirstOrDefault(l => l.EntityId == lightChangeStateEvent.EntityId);
+        var lightId = _lightsIds.FirstOrDefault(l => l.EntityId == changeEntityStateEvent.EntityId);
         if (lightId is null)
         {
             return;
         }
+        var state = changeEntityStateEvent.State;
         var _ = (_hueClient!.UpdateLightAsync(lightId.HueId, new PhilipsHueUpdateLight { 
-            On = lightChangeStateEvent.TurnedOn is not null ? new() { TurnedOn = lightChangeStateEvent.TurnedOn.Value } : null,
-            Dimming = lightChangeStateEvent.Brightness is not null ? new() { Brightness = lightChangeStateEvent.Brightness.Value } : null
+            On = state.TurnedOn is not null ? new() { TurnedOn = state.TurnedOn.Value } : null,
+            Dimming = state.Brightness is not null ? new() { Brightness = state.Brightness.Value } : null
         })).Result;
     }
 
     public Task StopAsync()
     {
-        _eventsService.Unsubscribe(EventNames.LightChangeState, OnLightChangeState);
+        _eventsService.Unsubscribe(EventNames.ChangeEntityState, OnChangeLightState);
         return Task.CompletedTask;
     }
 
@@ -181,11 +184,11 @@ public class HueExtension : IExtension
             Name = light.Metadata?.Name ?? $"Light {index}",
             Available = true,
             Enabled = true,
-            MinColorTemperature = 153,
-            MaxColorTemperature = 542
+            MinColorTemperature = light.ColorTemperature?.MirekSchema?.MirekMinimum,
+            MaxColorTemperature = light.ColorTemperature?.MirekSchema?.MirekMinimum
         };
     }
-
+    
     private string GenerateEntityId(PhilipsHueLight light, int index)
     {
         var name = light.Metadata?.Name ?? $"Light {index}";
