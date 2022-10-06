@@ -26,6 +26,7 @@ public class HueExtension : IExtension
 
     private IHueClient? _hueClient;
     private List<LightId> _lightsIds = new();
+    private CancellationTokenSource? _eventStreamCancellationTokenSource;
 
     public string Id => "hue";
     public string? DisplayName => "Philips Hue";
@@ -124,6 +125,57 @@ public class HueExtension : IExtension
         await ReportCurrentStateForLightsAsync();
         
         _eventsService.Subscribe(EventNames.ChangeEntityState, OnChangeLightState);
+
+        StartListeningForEvents();
+    }
+
+    public Task StopAsync()
+    {
+        _eventsService.Unsubscribe(EventNames.ChangeEntityState, OnChangeLightState);
+
+        StopListeningForEvents();
+
+        return Task.CompletedTask;
+    }
+
+
+    private void StartListeningForEvents()
+    {
+        if (_hueClient is null) {
+            return;
+        }
+
+        _hueClient.OnEventMessage += ProcessEventMessages;
+        _hueClient.StartListeningForEventsAsync();
+    }
+
+    private void ProcessEventMessages(IEnumerable<PhilipsHueEventResponse> events)
+    {
+        foreach (var hueEvent in events)
+        {
+            foreach (var data in hueEvent.Data)
+            {
+                if (data.Type == "light")
+                {
+                    var lightId = _lightsIds.FirstOrDefault(l => l.HueId == data.Id);
+                    if (lightId is null) {
+                        continue;
+                    }
+                    var state = new LightEntityState
+                    {
+                        TurnedOn = data.On?.TurnedOn,
+                        Brightness = (byte?)data.Dimming?.Brightness,
+                        ColorTemperature = data.ColorTemperature?.Mirek
+                    };
+                    _eventsService.Publish(new ChangeEntityStateEvent<LightEntityState>(lightId.EntityId, state));
+                }
+            }
+        }
+    }
+
+    private void StopListeningForEvents()
+    {
+        _hueClient?.StopListeningForEvents();
     }
 
     private async Task ReportCurrentStateForLightsAsync()
@@ -132,7 +184,7 @@ public class HueExtension : IExtension
         {
             return;
         }
-        
+
         var lights = await _hueClient.GetLightsAsync();
         foreach (var lightId in _lightsIds)
         {
@@ -164,18 +216,12 @@ public class HueExtension : IExtension
             return;
         }
         var state = changeEntityStateEvent.State;
-        var _ = (_hueClient!.UpdateLightAsync(lightId.HueId, new PhilipsHueUpdateLight { 
+        var _ = (_hueClient!.UpdateLightAsync(lightId.HueId, new PhilipsHueUpdateLight
+        {
             On = state.TurnedOn is not null ? new() { TurnedOn = state.TurnedOn.Value } : null,
             Dimming = state.Brightness is not null ? new() { Brightness = state.Brightness.Value } : null
         })).Result;
     }
-
-    public Task StopAsync()
-    {
-        _eventsService.Unsubscribe(EventNames.ChangeEntityState, OnChangeLightState);
-        return Task.CompletedTask;
-    }
-
 
     private LightEntity MapLightToEntity(PhilipsHueLight light, int index)
     {

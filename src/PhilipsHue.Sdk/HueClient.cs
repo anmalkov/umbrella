@@ -14,6 +14,10 @@ public class HueClient : IHueClient
 
     private string? _appKey;
     private string? _clientKey;
+    private CancellationTokenSource? _eventStreamCancellationTokenSource;
+
+    public event Action<IEnumerable<PhilipsHueEventResponse>> OnEventMessage;
+
 
     private enum ResourceType
     {
@@ -112,6 +116,9 @@ public class HueClient : IHueClient
         var resourceIdPart = id is null ? "" : $"/{id}";
         return new Uri($"https://{_ip}/clip/v2/resource{resourceTypePart}{resourceIdPart}");
     }
+    
+    private Uri GetEventsUri() => new($"https://{_ip}/eventstream/clip/v2");
+
 
     public async Task<IEnumerable<PhilipsHueLight>> GetLightsAsync()
     {
@@ -149,4 +156,48 @@ public class HueClient : IHueClient
 
         return philipsHueResponse is not null ? philipsHueResponse : new();
     }
+
+    public async Task StartListeningForEventsAsync(CancellationToken? cancellationToken = null)
+    {
+        StopListeningForEvents();
+
+        _eventStreamCancellationTokenSource = cancellationToken.HasValue
+            ? CancellationTokenSource.CreateLinkedTokenSource(cancellationToken!.Value)
+            : new CancellationTokenSource();
+            
+
+        var tokenToCancel = _eventStreamCancellationTokenSource.Token;
+
+        try
+        {
+            while (!tokenToCancel.IsCancellationRequested)
+            {
+                using (var reader = new StreamReader(await _httpClient.GetStreamAsync(GetEventsUri(), tokenToCancel)))
+                {
+                    while (!reader.EndOfStream)
+                    {
+                        var json = await reader.ReadLineAsync();
+                        if (json is not null)
+                        {
+                            var events = JsonSerializer.Deserialize<IEnumerable<PhilipsHueEventResponse>>(json);
+                            if (events is not null && events.Any())
+                            {
+                                OnEventMessage?.Invoke(events);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        catch (TaskCanceledException)
+        {
+            // Ignore becasue task is canceled
+        }
+    }
+
+    public void StopListeningForEvents()
+    {
+        _eventStreamCancellationTokenSource?.Cancel();
+    }
+
 }
