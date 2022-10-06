@@ -42,6 +42,7 @@ public class ExtensionsService : IExtensionsService
         
         await extension.RegisterAsync(parameters);
         await _extensionRepository.AddAsync(new RegisteredExtension(extension.Id, parameters));
+        await extension.StartAsync(parameters);
     }
 
     public async Task UnregisterAsync(string id)
@@ -58,6 +59,7 @@ public class ExtensionsService : IExtensionsService
             return;
         }
 
+        await extension.StopAsync();
         await extension.UnregisterAsync(registeredExtension.Parameters);
         await _entitiesService.DeleteByOwnerAsync(registeredExtension.Id);
         await _extensionRepository.DeleteAync(registeredExtension.Id);

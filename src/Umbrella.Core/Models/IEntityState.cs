@@ -2,5 +2,5 @@
 
 public interface IEntityState
 {
-    bool Available { get; set; }
+    bool? Connected { get; set; }
 }

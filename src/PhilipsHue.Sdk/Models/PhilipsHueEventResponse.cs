@@ -32,9 +32,9 @@ public class PhilipsHueEventData
 
     [JsonPropertyName("type")]
     public string Type { get; set; } = default!;
-    
+
     [JsonPropertyName("owner")]
-    public PhilipsHueResourceIdentifier? Owner { get; set; }
+    public PhilipsHueResourceIdentifier Owner { get; set; } = default!;
 
     [JsonPropertyName("on")]
     public On? On { get; set; }
@@ -47,6 +47,10 @@ public class PhilipsHueEventData
 
     [JsonPropertyName("dimming")]
     public Dimming? Dimming { get; set; }
+
+    [JsonPropertyName("status")]
+    public string? Status { get; set; }
+
 }
 
 

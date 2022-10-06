@@ -18,12 +18,14 @@ public class HueClient : IHueClient
 
     public event Action<IEnumerable<PhilipsHueEventResponse>> OnEventMessage;
 
-
+    
     private enum ResourceType
     {
-        Light
+        Light,
+        ZigbeeConnectivity
     }
 
+    
     private bool BridgeRegistered => !string.IsNullOrEmpty(_appKey);
 
 
@@ -90,41 +92,11 @@ public class HueClient : IHueClient
         return BridgeRegistered ? new PhilipsHueRegistrationInfo(_appKey!, _clientKey!) : null;
     }
 
-    private void Unregister()
-    {
-        if (!BridgeRegistered)
-        {
-            return;
-        }
-
-        _appKey = null;
-        _clientKey = null;
-    }
-
-    private Uri GetV1Uri()
-    {
-        var appKeyPart = string.IsNullOrWhiteSpace(_appKey) ? "" : $"{_appKey}/";
-        return new Uri($"https://{_ip}/api/{appKeyPart}");
-    }
-    private Uri GetUri(ResourceType type, Guid? id = null)
-    {
-        var resourceTypePart = type switch
-        {
-           ResourceType.Light => "/light",
-           _ => ""
-        };
-        var resourceIdPart = id is null ? "" : $"/{id}";
-        return new Uri($"https://{_ip}/clip/v2/resource{resourceTypePart}{resourceIdPart}");
-    }
-    
-    private Uri GetEventsUri() => new($"https://{_ip}/eventstream/clip/v2");
-
-
     public async Task<IEnumerable<PhilipsHueLight>> GetLightsAsync()
     {
         _httpClient.DefaultRequestHeaders.Remove("hue-application-key");
         _httpClient.DefaultRequestHeaders.Add("hue-application-key", _appKey);
-        
+
         var response = await _httpClient.GetAsync(GetUri(ResourceType.Light));
         if (!response.IsSuccessStatusCode)
         {
@@ -134,6 +106,22 @@ public class HueClient : IHueClient
         var philipsHueResponse = await response.Content.ReadFromJsonAsync<PhilipsHueResponse<PhilipsHueLight>>();
 
         return philipsHueResponse is not null ? philipsHueResponse.Data : new();
+    }
+
+    public async Task<PhilipsHueLight> GetLightAsync(Guid id)
+    {
+        _httpClient.DefaultRequestHeaders.Remove("hue-application-key");
+        _httpClient.DefaultRequestHeaders.Add("hue-application-key", _appKey);
+
+        var response = await _httpClient.GetAsync(GetUri(ResourceType.Light, id));
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new PhilipsHueException($"Response from the bridge has unexpected HTTP status code: {response.StatusCode}");
+        }
+
+        var philipsHueResponse = await response.Content.ReadFromJsonAsync<PhilipsHueResponse<PhilipsHueLight>>();
+
+        return philipsHueResponse is not null ? philipsHueResponse.Data.First() : new();
     }
 
     public async Task<PhilipsHuePutResponse> UpdateLightAsync(Guid id, PhilipsHueUpdateLight data)
@@ -151,7 +139,7 @@ public class HueClient : IHueClient
             var content = await response.Content.ReadAsStringAsync();
             throw new PhilipsHueException($"Response from the bridge has unexpected HTTP status code: {response.StatusCode}");
         }
-        
+
         var philipsHueResponse = await response.Content.ReadFromJsonAsync<PhilipsHuePutResponse>();
 
         return philipsHueResponse is not null ? philipsHueResponse : new();
@@ -164,7 +152,7 @@ public class HueClient : IHueClient
         _eventStreamCancellationTokenSource = cancellationToken.HasValue
             ? CancellationTokenSource.CreateLinkedTokenSource(cancellationToken!.Value)
             : new CancellationTokenSource();
-            
+
 
         var tokenToCancel = _eventStreamCancellationTokenSource.Token;
 
@@ -172,6 +160,8 @@ public class HueClient : IHueClient
         {
             while (!tokenToCancel.IsCancellationRequested)
             {
+                _httpClient.DefaultRequestHeaders.Remove("hue-application-key");
+                _httpClient.DefaultRequestHeaders.Add("hue-application-key", _appKey);
                 using (var reader = new StreamReader(await _httpClient.GetStreamAsync(GetEventsUri(), tokenToCancel)))
                 {
                     while (!reader.EndOfStream)
@@ -200,4 +190,40 @@ public class HueClient : IHueClient
         _eventStreamCancellationTokenSource?.Cancel();
     }
 
+    public void Dispose()
+    {
+        StopListeningForEvents();
+    }
+
+
+    private void Unregister()
+    {
+        if (!BridgeRegistered)
+        {
+            return;
+        }
+
+        _appKey = null;
+        _clientKey = null;
+    }
+
+    private Uri GetV1Uri()
+    {
+        var appKeyPart = string.IsNullOrWhiteSpace(_appKey) ? "" : $"{_appKey}/";
+        return new Uri($"https://{_ip}/api/{appKeyPart}");
+    }
+
+    private Uri GetUri(ResourceType type, Guid? id = null)
+    {
+        var resourceTypePart = type switch
+        {
+           ResourceType.Light => "/light",
+           ResourceType.ZigbeeConnectivity => "/zigbee_connectivity",
+            _ => ""
+        };
+        var resourceIdPart = id is null ? "" : $"/{id}";
+        return new Uri($"https://{_ip}/clip/v2/resource{resourceTypePart}{resourceIdPart}");
+    }
+    
+    private Uri GetEventsUri() => new($"https://{_ip}/eventstream/clip/v2");
 }

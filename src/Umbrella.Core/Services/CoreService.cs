@@ -34,7 +34,7 @@ public class CoreService : ICoreService, IDisposable
             }
         }
         
-        _timer = new Timer(DoWork, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
+        //_timer = new Timer(DoWork, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
     }
 
     public Task StopAsync()
@@ -48,6 +48,7 @@ public class CoreService : ICoreService, IDisposable
     {
         _timer?.Dispose();
     }
+    
 
     private void DoWork(object? state)
     {

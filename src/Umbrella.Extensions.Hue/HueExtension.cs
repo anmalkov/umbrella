@@ -1,6 +1,5 @@
 ﻿using PhilipsHue.Sdk;
 using PhilipsHue.Sdk.Models;
-using System.Net.Http;
 using System.Text.Json;
 using Umbrella.Core.Events;
 using Umbrella.Core.Extensions;
@@ -9,7 +8,7 @@ using Umbrella.Core.Services;
 
 namespace Umbrella.Extensions.Hue;
 
-internal record LightId(Guid HueId, string EntityId);
+internal record LightId(Guid HueId, Guid HueDeviceId, string EntityId);
 
 public class HueExtension : IExtension
 {
@@ -96,7 +95,7 @@ public class HueExtension : IExtension
         {
             var entity = MapLightToEntity(light, lightIndex++);
             await _coreService.RegisterEntityAsync(entity, Id);
-            lightsIds.Add(new LightId(light.Id, entity.Id));
+            lightsIds.Add(new LightId(light.Id, light.Owner.Rid, entity.Id));
         }
 
         parameters.Add(LightsIdsParameterName, JsonSerializer.Serialize(lightsIds));
@@ -145,19 +144,21 @@ public class HueExtension : IExtension
             return;
         }
 
-        _hueClient.OnEventMessage += ProcessEventMessages;
+        _hueClient.OnEventMessage += async (events) => await ProcessEventMessages(events);
         _hueClient.StartListeningForEventsAsync();
     }
 
-    private void ProcessEventMessages(IEnumerable<PhilipsHueEventResponse> events)
+    private async Task ProcessEventMessages(IEnumerable<PhilipsHueEventResponse> events)
     {
         foreach (var hueEvent in events)
         {
             foreach (var data in hueEvent.Data)
             {
-                if (data.Type == "light")
+                if (data.Type == PhilipsHueType.Light || data.Type == PhilipsHueType.ZigbeeConnectivity)
                 {
-                    var lightId = _lightsIds.FirstOrDefault(l => l.HueId == data.Id);
+                    var lightId = data.Type == PhilipsHueType.Light
+                        ? _lightsIds.FirstOrDefault(l => l.HueId == data.Id)
+                        : _lightsIds.FirstOrDefault(l => l.HueDeviceId == data.Owner.Rid);
                     if (lightId is null) {
                         continue;
                     }
@@ -165,8 +166,19 @@ public class HueExtension : IExtension
                     {
                         TurnedOn = data.On?.TurnedOn,
                         Brightness = (byte?)data.Dimming?.Brightness,
-                        ColorTemperature = data.ColorTemperature?.Mirek
+                        ColorTemperature = data.ColorTemperature?.Mirek,
+                        Connected = string.IsNullOrEmpty(data.Status) ? default : data.Status == "connected"
                     };
+                    if (state.Connected.HasValue && state.Connected.Value)
+                    {
+                        var light = await _hueClient!.GetLightAsync(lightId.HueId);
+                        if (light is not null)
+                        { 
+                            state.TurnedOn = light.On.TurnedOn;
+                            state.Brightness = (byte?)light.Dimming?.Brightness;
+                            state.ColorTemperature = light.ColorTemperature?.Mirek;
+                        }
+                    }
                     _eventsService.Publish(new ChangeEntityStateEvent<LightEntityState>(lightId.EntityId, state));
                 }
             }
