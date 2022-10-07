@@ -7,20 +7,22 @@ using Umbrella.Core.Extensions;
 
 namespace Umbrella.Core.Services;
 
-public class CoreService : ICoreService, IDisposable
+public class CoreService : ICoreService
 {
-    private Timer? _timer = null;
     private readonly IExtensionsService _extensionsService;
     private readonly IEnumerable<IExtension> _extensions;
+    private readonly IEntitiesStateService _entitiesStateService;
 
-    public CoreService(IExtensionsService extensionsService, IEnumerable<IExtension> extensions)
+    public CoreService(IExtensionsService extensionsService, IEnumerable<IExtension> extensions, IEntitiesStateService entitiesStateService)
     {
         _extensionsService = extensionsService;
         _extensions = extensions;
+        _entitiesStateService = entitiesStateService;
     }
     
     public async Task StartAsync()
     {
+        _entitiesStateService.StartMonitoring();
         var registeredExtensions = await _extensionsService.GetRegisteredAsync();
         if (registeredExtensions is not null)
         {
@@ -33,25 +35,22 @@ public class CoreService : ICoreService, IDisposable
                 }
             }
         }
-        
-        //_timer = new Timer(DoWork, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
     }
 
-    public Task StopAsync()
+    public async Task StopAsync()
     {
-        _timer?.Change(Timeout.Infinite, 0);
-
-        return Task.CompletedTask;
-    }
-    
-    public void Dispose()
-    {
-        _timer?.Dispose();
-    }
-    
-
-    private void DoWork(object? state)
-    {
-        
+        var registeredExtensions = await _extensionsService.GetRegisteredAsync();
+        if (registeredExtensions is not null)
+        {
+            foreach (var registeredExtension in registeredExtensions)
+            {
+                var extension = _extensions.FirstOrDefault(e => e.Id == registeredExtension.Id);
+                if (extension is not null)
+                {
+                    await extension.StopAsync();
+                }
+            }
+        }
+        _entitiesStateService.StopMonitoring();
     }
 }

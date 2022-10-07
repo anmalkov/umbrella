@@ -37,8 +37,8 @@ namespace Umbrella.Core.Tests
 
             var entities = new List<IEntity>
             {
-                new LightEntity("light.test1") { Name = "Light 1", Available = true, MinColorTemperature = 100, MaxColorTemperature = 5000 },
-                new LightEntity("light.test2") { Name = "Light 2", Available = true, MinColorTemperature = 3000, MaxColorTemperature = 6000 }
+                new LightEntity("light.test1") { Name = "Light 1", Enabled = true, MinColorTemperature = 100, MaxColorTemperature = 5000 },
+                new LightEntity("light.test2") { Name = "Light 2", Enabled = true, MinColorTemperature = 3000, MaxColorTemperature = 6000 }
             };
 
             if (File.Exists(fullFilename))

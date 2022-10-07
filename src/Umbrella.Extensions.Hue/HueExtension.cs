@@ -167,7 +167,7 @@ public class HueExtension : IExtension
                         TurnedOn = data.On?.TurnedOn,
                         Brightness = (byte?)data.Dimming?.Brightness,
                         ColorTemperature = data.ColorTemperature?.Mirek,
-                        Connected = string.IsNullOrEmpty(data.Status) ? default : data.Status == "connected"
+                        Connected = string.IsNullOrEmpty(data.Status) ? null : data.Status == "connected"
                     };
                     if (state.Connected.HasValue && state.Connected.Value)
                     {
@@ -179,7 +179,7 @@ public class HueExtension : IExtension
                             state.ColorTemperature = light.ColorTemperature?.Mirek;
                         }
                     }
-                    _eventsService.Publish(new ChangeEntityStateEvent<LightEntityState>(lightId.EntityId, state));
+                    _eventsService.Publish(new EntityStateChangedEvent(lightId.EntityId, state));
                 }
             }
         }
@@ -211,13 +211,19 @@ public class HueExtension : IExtension
                 Brightness = (byte?)light.Dimming?.Brightness,
                 ColorTemperature = light.ColorTemperature?.Mirek
             };
-            _eventsService.Publish(new ChangeEntityStateEvent<LightEntityState>(lightId.EntityId, state));
+            _eventsService.Publish(new EntityStateChangedEvent(lightId.EntityId, state));
         }
     }
-
+    
     private void OnChangeLightState(IEvent? payload)
     {
-        if (payload is null || payload is not ChangeEntityStateEvent<LightEntityState> changeEntityStateEvent)
+        if (payload is null || payload is not ChangeEntityStateEvent changeEntityStateEvent)
+        {
+            return;
+        }
+
+        var state = changeEntityStateEvent.State as LightEntityState;
+        if (state is null)
         {
             return;
         }
@@ -227,7 +233,6 @@ public class HueExtension : IExtension
         {
             return;
         }
-        var state = changeEntityStateEvent.State;
         var _ = (_hueClient!.UpdateLightAsync(lightId.HueId, new PhilipsHueUpdateLight
         {
             On = state.TurnedOn is not null ? new() { TurnedOn = state.TurnedOn.Value } : null,
@@ -240,7 +245,6 @@ public class HueExtension : IExtension
         return new LightEntity(GenerateEntityId(light, index))
         {
             Name = light.Metadata?.Name ?? $"Light {index}",
-            Available = true,
             Enabled = true,
             MinColorTemperature = light.ColorTemperature?.MirekSchema?.MirekMinimum,
             MaxColorTemperature = light.ColorTemperature?.MirekSchema?.MirekMinimum

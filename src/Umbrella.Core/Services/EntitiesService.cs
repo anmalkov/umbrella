@@ -9,11 +9,12 @@ namespace Umbrella.Core.Services;
 public sealed class EntitiesService : IEntitiesService
 {
     private readonly IEntitiesRepository _entitiesRepository;
-    
+    private readonly IEntitiesStateService _stateService;
 
-    public EntitiesService(IEntitiesRepository entitiesRepository)
+    public EntitiesService(IEntitiesRepository entitiesRepository, IEntitiesStateService stateService)
     {
         _entitiesRepository = entitiesRepository;
+        _stateService = stateService;
     }
 
         
@@ -37,7 +38,13 @@ public sealed class EntitiesService : IEntitiesService
         return await _entitiesRepository.GetCountAsync(owner);
     }
 
-    
+    public IEntityState? GetState(string id)
+    {
+        return _stateService.GetState(id);
+    }
+
+
+
     public async Task RegisterAsync(IEntity entity)
     {
         if (await _entitiesRepository.GetAsync(entity.Id) is not null)

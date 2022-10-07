@@ -13,8 +13,9 @@ namespace Umbrella.Core.Tests
 
             var repository = new Mock<IEntitiesRepository>();
             repository.Setup(r => r.GetAsync(It.IsAny<string>())).Returns(Task.FromResult(entity as IEntity));
+            var stateService= new Mock<IEntitiesStateService>();
 
-            var service = new EntitiesService(repository.Object);
+            var service = new EntitiesService(repository.Object, stateService.Object);
             
             await Assert.ThrowsAsync<ArgumentException>(async () => await service.RegisterAsync(entity));
         }

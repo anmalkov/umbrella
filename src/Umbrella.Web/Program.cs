@@ -14,6 +14,7 @@ builder.Services.AddSingleton<IExtension, HueExtension>();
 builder.Services.AddSingleton<IExtension, XiaomiExtension>();
 
 builder.Services.AddSingleton<IEventsService, EventsService>();
+builder.Services.AddSingleton<IEntitiesStateService, EntitiesStateService>();
 builder.Services.AddSingleton<ICoreService, CoreService>();
 builder.Services.AddSingleton<IExtensionsService, ExtensionsService>();
 builder.Services.AddSingleton<IExtensionRepository, ExtensionRepository>();

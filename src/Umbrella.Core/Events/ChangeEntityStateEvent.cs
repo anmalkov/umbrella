@@ -2,13 +2,13 @@
 
 namespace Umbrella.Core.Events;
 
-public sealed class ChangeEntityStateEvent<T> : IEvent where T : IEntityState
+public sealed class ChangeEntityStateEvent : IEvent
 {
     public string Name => EventNames.ChangeEntityState;
     public string EntityId { get; init; }
-    public T State { get; set; }
+    public IEntityState State { get; set; }
 
-    public ChangeEntityStateEvent(string entityId, T state)
+    public ChangeEntityStateEvent(string entityId, IEntityState state)
     {
         EntityId = entityId;
         State = state;

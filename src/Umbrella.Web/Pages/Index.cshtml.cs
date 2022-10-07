@@ -8,18 +8,23 @@ namespace Umbrella.Web.Pages
 {
     public class IndexModel : PageModel
     {
+        public LightEntityState? State { get; private set; }
+
         private readonly ILogger<IndexModel> _logger;
         private readonly IEventsService _eventsService;
-
-        public IndexModel(ILogger<IndexModel> logger, IEventsService eventsService)
+        private readonly IEntitiesService _entitiesService;
+        
+        public IndexModel(ILogger<IndexModel> logger, IEventsService eventsService, IEntitiesService entitiesService)
         {
             _logger = logger;
             _eventsService = eventsService;
+            _entitiesService = entitiesService;
         }
 
         public void OnGet()
         {
-
+            var state = _entitiesService.GetState("light.hue.test");
+            State = state as LightEntityState;
         }
 
         public void OnPostTestLight()
@@ -31,7 +36,7 @@ namespace Umbrella.Web.Pages
                 TurnedOn = turnedOn,
                 Brightness = brightness
             };
-            _eventsService.Publish(new ChangeEntityStateEvent<LightEntityState>("light.hue.test", state));
+            _eventsService.Publish(new ChangeEntityStateEvent("light.hue.test", state));
         }
     }
 }

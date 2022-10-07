@@ -11,7 +11,6 @@ public class EntityBase : IEntity
     public string? Name { get; set; }
     public string? Icon { get; set; }
     public string? Owner { get; set; }
-    public bool Available { get; set; }
     public bool Enabled { get; set; }
     public EntityType Type { get; init; }
 
