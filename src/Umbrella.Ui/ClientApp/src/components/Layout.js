@@ -5,7 +5,7 @@ import Screensaver from './Screensaver';
 
 const Layout = (props) => {
 
-    const [screensaverShown, setScreensaverShown] = useState(true);
+    const [screensaverShown, setScreensaverShown] = useState(false);
     const [screensaverTimeout, setScreensaverTimeout] = useState(-1);
 
     const hideScreensaver = () => {
@@ -18,14 +18,12 @@ const Layout = (props) => {
 
     const startTimeout = () => {
         clearTimeout(screensaverTimeout);
-        console.log("new timeout");
         const timeout = setTimeout(showScreensaver, 60000);
         setScreensaverTimeout(timeout);
     }
 
     const appTouched = (e) => {
         if (e.target.id !== "screensaver") {
-            console.log("clicked");
             startTimeout();
         }
     }
