@@ -13,9 +13,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbrella.Web", "Umbrella.We
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbrella.Extensions.Xiaomi", "Umbrella.Extensions.Xiaomi\Umbrella.Extensions.Xiaomi.csproj", "{CFEDB0BA-2D13-4C85-8F36-8EDF3965471A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhilipsHue.Sdk", "PhilipsHue.Sdk\PhilipsHue.Sdk.csproj", "{16B2C004-F482-4BE5-AAC1-1CEE3F69339D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhilipsHue.Sdk", "PhilipsHue.Sdk\PhilipsHue.Sdk.csproj", "{16B2C004-F482-4BE5-AAC1-1CEE3F69339D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhilipsHue.Sdk.Tests", "PhilipsHue.Sdk.Tests\PhilipsHue.Sdk.Tests.csproj", "{7B675307-8278-4AE7-B81A-BEBB4A12F29E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhilipsHue.Sdk.Tests", "PhilipsHue.Sdk.Tests\PhilipsHue.Sdk.Tests.csproj", "{7B675307-8278-4AE7-B81A-BEBB4A12F29E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbrella.Ui", "Umbrella.Ui\Umbrella.Ui.csproj", "{B8208D17-A67D-4D89-BB17-A5B7EC7E88E3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +53,10 @@ Global
 		{7B675307-8278-4AE7-B81A-BEBB4A12F29E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7B675307-8278-4AE7-B81A-BEBB4A12F29E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7B675307-8278-4AE7-B81A-BEBB4A12F29E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B8208D17-A67D-4D89-BB17-A5B7EC7E88E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8208D17-A67D-4D89-BB17-A5B7EC7E88E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8208D17-A67D-4D89-BB17-A5B7EC7E88E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8208D17-A67D-4D89-BB17-A5B7EC7E88E3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
