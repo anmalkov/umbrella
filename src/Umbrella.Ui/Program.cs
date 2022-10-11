@@ -1,13 +1,18 @@
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Umbrella.Core.Extensions;
 using Umbrella.Core.Repositories;
 using Umbrella.Core.Services;
 using Umbrella.Extensions.Hue;
 using Umbrella.Extensions.Xiaomi;
+using Umbrella.Ui.Extensions;
+using Umbrella.Ui.Requests;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddMediatR(m => m.AsScoped(), typeof(Program));
+
+//builder.Services.AddControllersWithViews();
 
 builder.Services.AddSingleton<IExtension, HueExtension>();
 builder.Services.AddSingleton<IExtension, XiaomiExtension>();
@@ -31,14 +36,18 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
-app.UseRouting();
+//app.UseStaticFiles();
+//app.UseRouting();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller}/{action=Index}/{id?}");
+//app.MapControllerRoute(
+//    name: "default",
+//    pattern: "{controller}/{action=Index}/{id?}");
 
-app.MapFallbackToFile("index.html");
+app.MediateGet<GetExtensionsRequest>("/api/extensions");
+app.MediatePost<RegisterExtensionRequest>("/api/extensions/{id}");
+app.MediateDelete<UnregisterExtensionRequest>("/api/extensions/{id}");
+
+//app.MapFallbackToFile("index.html");
 
 var coreService = app.Services.GetService<ICoreService>();
 await coreService!.StartAsync();

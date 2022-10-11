@@ -1,30 +1,24 @@
-import React, { useRef, useState } from 'react';
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter, Row, Alert } from 'reactstrap';
+import React, { useEffect, useRef, useState } from 'react';
+import { Button, Modal, ModalHeader, ModalBody, ModalFooter, Row, Alert, Spinner } from 'reactstrap';
 import Extension from './Extension';
 
 const Extensions = () => {
 
-    const extensions = [
-        { id: "1", displayName: "Test 1", entitiesCount: 10, registered: true },
-        { id: "2", displayName: "Test 2", entitiesCount: 5, registered: true },
-        {
-            id: "3", displayName: "Test 3", registered: false, htmlForRegistration: `
-                <div class=\"mb-3\">
-                  <label for=\"bridgeIp\" class= \"form-label\">Hue bridge IP address</label >
-                  <input type=\"text\" class= \"form-control\" id=\"bridgeIp\" aria-describedby=\"hubIpAddressHelp\" >
-                  <div id=\"hubIpAddressHelp\" class=\"form-text\">In the Hue mobile app go to: Settings -> My Hue System -> Philips Hue</div>
-                </div >
-                <p><b>NOTE:</b>Please make sure that you press the button on your Philips Hue Hub before you press 'Register' button below</p>` },
-        { id: "4", displayName: "Test 4", registered: false, htmlForRegistration: "Test text 2" },
-
-    ];
-
+    const [extensionsList, setExtensionsList] = useState([]);
+    const [error, setError] = useState(null);
+    const [registrationError, setRegistrationError] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
     const [selectedExtension, setSelectedExtension] = useState({});
     const [isRegistrationDialogOpen, setIsRegistrationDialogOpen] = useState(false);
 
     const registrationParamsRef = useRef(null);
 
-    const toggleRegistrationDialog = () => setIsRegistrationDialogOpen(!isRegistrationDialogOpen);
+    const toggleRegistrationDialog = () => {
+        setIsRegistrationDialogOpen(!isRegistrationDialogOpen)
+        if (isRegistrationDialogOpen) {
+            setRegistrationError(null);
+        }
+    };
 
     const selectExtension = (extension) => {
         setSelectedExtension(extension);
@@ -38,40 +32,123 @@ const Extensions = () => {
     }
 
     const unregisterExtension = (id) => {
-        //send unregister request
+        const request = {
+            method: 'DELETE'
+        };
+        fetch(`api/extensions/${id}`, request)
+            .then(
+                response => {
+                    if (response.status !== 200) {
+                        response.json()
+                            .then(
+                                result => {
+                                    setError(result.detail);
+                                },
+                                error => {
+                                    setError(new Error(`[${response.status} ${response.statusText}] ${error}`));
+                                }
+                            );
+                        return;
+                    }
+                    getExtensions();
+                },
+                error => {
+                    setError(error);
+                }
+            );
+
     }
 
-    const registerExtension = (extension) => {
-        const inputs = Array.from(registrationParamsRef.current.getElementsByTagName("input"));
-        const data = {}
-        inputs.reduce((result, e) => {
-            result[e.id] = e.value;
-        }, data);
-        // send register request with data 
-        setIsRegistrationDialogOpen(false);
+    const registerExtension = () => {
+        setRegistrationError(null);
+        const inputs = Array.from(registrationParamsRef.current.getElementsByTagName('input'));
+        const data = [];
+        inputs.forEach(e => data.push({ key: e.id ? e.id : e.name, value: e.value }));
+        const request = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ parameters: data })
+        };
+        fetch(`api/extensions/${selectedExtension.id}`, request)
+            .then(
+                response => {
+                    if (response.status !== 200) {
+                        response.json()
+                            .then(
+                                result => {
+                                    setRegistrationError(result.detail);
+                                },
+                                error => {
+                                    setRegistrationError(error);
+                                }
+                        );
+                        return;
+                    }
+                    setIsRegistrationDialogOpen(false);
+                    getExtensions();
+                },
+                error => {
+                    setRegistrationError(error);
+                }
+            );
     }
 
+    const getExtensions = () => {
+        fetch('api/extensions')
+            .then(response => response.json())
+            .then(
+                result => {
+                    setIsLoading(false);
+                    setExtensionsList(result);
+                },
+                error => {
+                    setIsLoading(false);
+                    setError(error)
+                }
+            )
+    }
+
+    useEffect(() => {
+        getExtensions();
+    }, []);
+
+    if (isLoading) {
+        return (
+            <div className="text-center">
+                <Spinner color="light">
+                    Loading...
+                </Spinner>
+            </div>
+        );
+    }
 
     return (
-      <div>
+        <div>
+            {error &&
+                <Alert color="danger">
+                    {error.message}
+                </Alert>
+            }
             <h1 className="swimlane">Registered</h1>
             <Row>
-                {extensions.filter(e => e.registered).map(e =>
+                {extensionsList.filter(e => e.registered).map(e =>
                     <Extension key={e.id} id={e.id} displayName={e.displayName} entitiesCount={e.entitiesCount} registered={e.registered} onSelect={selectExtension} />
                 )}
             </Row>
             <h1 className="swimlane">Not registered</h1>
             <Row>
-                {extensions.filter(e => !e.registered).map((e) =>
+                {extensionsList.filter(e => !e.registered).map((e) =>
                     <Extension key={e.id} id={e.id} displayName={e.displayName} entitiesCount={e.entitiesCount} registered={e.registered} htmlForRegistration={e.htmlForRegistration} onSelect={selectExtension} />
                 )}
             </Row>
             <Modal isOpen={isRegistrationDialogOpen} centered={true} toggle={toggleRegistrationDialog}>
                 <ModalHeader toggle={toggleRegistrationDialog}>Register {selectedExtension.displayName}</ModalHeader>
                 <div ref={registrationParamsRef}>
-                    <Alert color="danger" className="m-3 mb-0">
-                        Error: Button on the hub is not pressed
-                    </Alert>
+                    { registrationError &&
+                        <Alert color="danger" className="m-3 mb-0">
+                            {registrationError}
+                        </Alert>
+                    }
                     <ModalBody dangerouslySetInnerHTML={{ __html: selectedExtension.htmlForRegistration }} />
                 </div>
                 <ModalFooter>

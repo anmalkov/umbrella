@@ -32,7 +32,7 @@ public class ExtensionsService : IExtensionsService
         return await _extensionRepository.GetAllAsync() ?? new List<RegisteredExtension>();
     }    
 
-    public async Task RegisterAsync(string id, Dictionary<string, string?>? parameters)
+    public async Task RegisterAsync(string id, IEnumerable<KeyValuePair<string, string?>>? parameters)
     {
         var extension = _extensions.FirstOrDefault(e => e.Id == id);
         if (extension is null)
@@ -40,9 +40,11 @@ public class ExtensionsService : IExtensionsService
             return;
         }
         
-        await extension.RegisterAsync(parameters);
-        await _extensionRepository.AddAsync(new RegisteredExtension(extension.Id, parameters));
-        await extension.StartAsync(parameters);
+        var paramsDictionary = parameters?.ToDictionary(p => p.Key, p => p.Value);
+        
+        await extension.RegisterAsync(paramsDictionary);
+        await _extensionRepository.AddAsync(new RegisteredExtension(extension.Id, paramsDictionary));
+        await extension.StartAsync(paramsDictionary);
     }
 
     public async Task UnregisterAsync(string id)
