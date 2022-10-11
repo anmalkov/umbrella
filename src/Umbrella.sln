@@ -17,7 +17,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhilipsHue.Sdk", "PhilipsHu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhilipsHue.Sdk.Tests", "PhilipsHue.Sdk.Tests\PhilipsHue.Sdk.Tests.csproj", "{7B675307-8278-4AE7-B81A-BEBB4A12F29E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbrella.Ui", "Umbrella.Ui\Umbrella.Ui.csproj", "{B8208D17-A67D-4D89-BB17-A5B7EC7E88E3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbrella.Ui", "Umbrella.Ui\Umbrella.Ui.csproj", "{B8208D17-A67D-4D89-BB17-A5B7EC7E88E3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docker", "Docker", "{48C427CF-03A5-4F46-AEE0-CFEF24B94642}"
+	ProjectSection(SolutionItems) = preProject
+		.dockerignore = .dockerignore
+		Dockerfile = Dockerfile
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

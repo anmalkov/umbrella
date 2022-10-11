@@ -1,7 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter, Row, Alert } from 'reactstrap';
 import Extension from './Extension';
-import './Extensions.css';
 
 const Extensions = () => {
 
