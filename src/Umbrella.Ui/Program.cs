@@ -36,20 +36,15 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-//app.UseStaticFiles();
+app.UseStaticFiles();
 //app.UseRouting();
-
-//app.MapControllerRoute(
-//    name: "default",
-//    pattern: "{controller}/{action=Index}/{id?}");
-
 
 app.MediateGet<GetExtensionsRequest>("/api/extensions");
 app.MediatePost<RegisterExtensionRequest>("/api/extensions/{id}");
 app.MediateDelete<UnregisterExtensionRequest>("/api/extensions/{id}");
 app.MediateGet<GetEntitiesRequest>("/api/entities");
 
-//app.MapFallbackToFile("index.html");
+app.MapFallbackToFile("index.html");
 
 var coreService = app.Services.GetService<ICoreService>();
 await coreService!.StartAsync();
