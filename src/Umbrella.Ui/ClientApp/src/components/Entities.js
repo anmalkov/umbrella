@@ -1,17 +1,40 @@
-import React, { useState } from 'react';
-import { Table } from 'reactstrap';
+import React, { useState, useEffect } from 'react';
+import { Table, Spinner, Alert } from 'reactstrap';
 
 const Entities = () => {
 
-    const entities = [
-        { id: 'hue.light.test1', name: 'Test 1', owner: 'hue' },
-        { id: 'hue.light.test2', name: 'Test 2', owner: 'hue' },
-        { id: 'hue.light.test3', name: 'Test 3', owner: 'hue' },
-        { id: 'hue.light.test4', name: 'Test 4', owner: 'hue' },
-        { id: 'hue.light.test5', name: 'Test 5', owner: 'hue' },
-    ];
+    const [entitiesList, setEntitiesList] = useState([]);
+    const [error, setError] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
 
-    const [entitiesList, setEntitiesList] = useState(entities);
+    const getEntities = () => {
+        fetch('api/entities')
+            .then(response => response.json())
+            .then(
+                result => {
+                    setIsLoading(false);
+                    setEntitiesList(result);
+                },
+                error => {
+                    setIsLoading(false);
+                    setError(error)
+                }
+            )
+    }
+
+    useEffect(() => {
+        getEntities();
+    }, []);
+
+    if (isLoading) {
+        return (
+            <div className="text-center">
+                <Spinner color="light">
+                    Loading...
+                </Spinner>
+            </div>
+        );
+    }    
 
     if (entitiesList.length === 0) {
         return (
@@ -23,6 +46,11 @@ const Entities = () => {
 
     return (
         <div>
+            { error &&
+                <Alert color="danger">
+                    {error.message}
+                </Alert>
+            }
             <Table dark hover>
                 <thead>
                     <tr>
@@ -33,7 +61,7 @@ const Entities = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    { entitiesList.map(entity => (
+                    {entitiesList.sort((a, b) => a.name > b.name ? 1 : -1).map(entity => (
                         <tr key={entity.id}>
                             <td></td>
                             <td>{entity.name}</td>

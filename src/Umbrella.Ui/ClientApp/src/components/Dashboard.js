@@ -23,10 +23,10 @@ const Dashboard = () => {
 
     return (
         <Row>
-            { [1, 2, 3, 4].map(col => (
-                <div className="col-lg-3 col-md-6 col-sm-12">
+            {[1, 2, 3, 4].map(col => (
+                <div key={col} className="col-lg-3 col-md-6 col-sm-12">
                     {widgetsList.filter(w => w.col === col).sort((a, b) => a.position > b.position ? 1 : -1).map(w => (
-                        <Widget />
+                        <Widget key={w.id} />
                      ))}
                 </div>
             ))}

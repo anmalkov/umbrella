@@ -43,9 +43,11 @@ app.UseHttpsRedirection();
 //    name: "default",
 //    pattern: "{controller}/{action=Index}/{id?}");
 
+
 app.MediateGet<GetExtensionsRequest>("/api/extensions");
 app.MediatePost<RegisterExtensionRequest>("/api/extensions/{id}");
 app.MediateDelete<UnregisterExtensionRequest>("/api/extensions/{id}");
+app.MediateGet<GetEntitiesRequest>("/api/entities");
 
 //app.MapFallbackToFile("index.html");
 
