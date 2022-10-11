@@ -23,7 +23,11 @@ th {
     border-top: 2px solid var(--divider-color);
 }
 
-
+.alert-danger {
+    background-color: var(--error-background);
+    border: none;
+    color: var(--text-color);
+}
 
 
 /* Provide sufficient contrast against white background */

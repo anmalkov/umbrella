@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter, Row } from 'reactstrap';
+import { Button, Modal, ModalHeader, ModalBody, ModalFooter, Row, Alert } from 'reactstrap';
 import Extension from './Extension';
 import './Extensions.css';
 
@@ -70,6 +70,9 @@ const Extensions = () => {
             <Modal isOpen={isRegistrationDialogOpen} centered={true} toggle={toggleRegistrationDialog}>
                 <ModalHeader toggle={toggleRegistrationDialog}>Register {selectedExtension.displayName}</ModalHeader>
                 <div ref={registrationParamsRef}>
+                    <Alert color="danger" className="m-3 mb-0">
+                        Error: Button on the hub is not pressed
+                    </Alert>
                     <ModalBody dangerouslySetInnerHTML={{ __html: selectedExtension.htmlForRegistration }} />
                 </div>
                 <ModalFooter>
