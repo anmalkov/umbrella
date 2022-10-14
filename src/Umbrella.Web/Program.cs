@@ -48,3 +48,4 @@ await coreService!.StartAsync();
 app.Run();
 
 await coreService!.StopAsync();
+

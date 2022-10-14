@@ -1,30 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Table, Spinner, Alert } from 'reactstrap';
+import { useQuery } from 'react-query';
+import { fetchEntities } from '../fetchers/entities';
 
 const Entities = () => {
 
-    const [entitiesList, setEntitiesList] = useState([]);
-    const [error, setError] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
-
-    const getEntities = () => {
-        fetch('api/entities')
-            .then(response => response.json())
-            .then(
-                result => {
-                    setIsLoading(false);
-                    setEntitiesList(result);
-                },
-                error => {
-                    setIsLoading(false);
-                    setError(error)
-                }
-            )
-    }
-
-    useEffect(() => {
-        getEntities();
-    }, []);
+    const { isError, isLoading, data, error } = useQuery(['entities'], fetchEntities, { staleTime: 60000 });
+    const entitiesList = data
 
     if (isLoading) {
         return (
@@ -46,7 +28,7 @@ const Entities = () => {
 
     return (
         <div>
-            { error &&
+            { isError &&
                 <Alert color="danger">
                     {error.message}
                 </Alert>

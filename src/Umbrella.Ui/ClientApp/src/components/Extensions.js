@@ -1,117 +1,68 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter, Row, Alert, Spinner } from 'reactstrap';
+import React, { useRef, useState, useEffect } from 'react';
+import { Button, Modal, ModalHeader, ModalBody, ModalFooter, Row, UncontrolledAlert, Spinner } from 'reactstrap';
+import { useQuery, useQueryClient, useMutation } from 'react-query';
+import { fetchExtensions, registerExtension, unregisterExtension } from '../fetchers/extensions';
 import Extension from './Extension';
 
 const Extensions = () => {
-
-    const [extensionsList, setExtensionsList] = useState([]);
-    const [error, setError] = useState(null);
-    const [registrationError, setRegistrationError] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
     const [selectedExtension, setSelectedExtension] = useState({});
     const [isRegistrationDialogOpen, setIsRegistrationDialogOpen] = useState(false);
+
+    const { isError, isLoading, data, error } = useQuery(['extensions'], fetchExtensions, { staleTime: 60000 });
+    const extensionsList = data
 
     const registrationParamsRef = useRef(null);
 
     const toggleRegistrationDialog = () => {
         setIsRegistrationDialogOpen(!isRegistrationDialogOpen)
-        if (isRegistrationDialogOpen) {
-            setRegistrationError(null);
-        }
     };
 
     const selectExtension = (extension) => {
         setSelectedExtension(extension);
         if (extension.registered) {
             if (window.confirm(`Do you want to unregister extension '${extension.displayName}' ?`)) {
-                unregisterExtension(extension.id)
+                unregister(extension.id)
             }
             return;
         }
+        registerMutation.reset();
         setIsRegistrationDialogOpen(true);
     }
 
-    const unregisterExtension = (id) => {
-        const request = {
-            method: 'DELETE'
-        };
-        fetch(`api/extensions/${id}`, request)
-            .then(
-                response => {
-                    if (response.status !== 200) {
-                        response.json()
-                            .then(
-                                result => {
-                                    setError(result.detail);
-                                },
-                                error => {
-                                    setError(new Error(`[${response.status} ${response.statusText}] ${error}`));
-                                }
-                            );
-                        return;
-                    }
-                    getExtensions();
-                },
-                error => {
-                    setError(error);
-                }
-            );
+    const queryClient = useQueryClient();
 
+    const registerMutation = useMutation(({ id, parameters }) => {
+        return registerExtension(id, parameters);
+    });
+
+    const unregisterMutation = useMutation(id => {
+        return unregisterExtension(id);
+    });
+
+    const register = async () => {
+        try {
+            const inputs = Array.from(registrationParamsRef.current.getElementsByTagName('input'));
+            const data = [];
+            inputs.forEach(e => data.push({ key: e.id ? e.id : e.name, value: e.value }));
+            await registerMutation.mutateAsync({ id: selectedExtension.id, parameters: data });
+            queryClient.invalidateQueries(['extensions']);
+            queryClient.invalidateQueries(['entities']);
+            queryClient.refetchQueries('extensions', { force: true });
+            setIsRegistrationDialogOpen(false);
+        }
+        catch { }
     }
 
-    const registerExtension = () => {
-        setRegistrationError(null);
-        const inputs = Array.from(registrationParamsRef.current.getElementsByTagName('input'));
-        const data = [];
-        inputs.forEach(e => data.push({ key: e.id ? e.id : e.name, value: e.value }));
-        const request = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ parameters: data })
-        };
-        fetch(`api/extensions/${selectedExtension.id}`, request)
-            .then(
-                response => {
-                    if (response.status !== 200) {
-                        response.json()
-                            .then(
-                                result => {
-                                    setRegistrationError(result.detail);
-                                },
-                                error => {
-                                    setRegistrationError(error);
-                                }
-                        );
-                        return;
-                    }
-                    setIsRegistrationDialogOpen(false);
-                    getExtensions();
-                },
-                error => {
-                    setRegistrationError(error);
-                }
-            );
+    const unregister = async (id) => {
+        try {
+            await unregisterMutation.mutateAsync(id);
+            queryClient.invalidateQueries(['extensions']);
+            queryClient.invalidateQueries(['entities']);
+            queryClient.refetchQueries('extensions', { force: true });
+        }
+        catch { }
     }
-
-    const getExtensions = () => {
-        fetch('api/extensions')
-            .then(response => response.json())
-            .then(
-                result => {
-                    setIsLoading(false);
-                    setExtensionsList(result);
-                },
-                error => {
-                    setIsLoading(false);
-                    setError(error)
-                }
-            )
-    }
-
-    useEffect(() => {
-        getExtensions();
-    }, []);
-
+    
     if (isLoading) {
         return (
             <div className="text-center">
@@ -124,10 +75,10 @@ const Extensions = () => {
 
     return (
         <div>
-            {error &&
-                <Alert color="danger">
-                    {error.message}
-                </Alert>
+            {(isError || unregisterMutation.isError) &&
+                <UncontrolledAlert color="danger">
+                    {isError ? error.message : unregisterMutation.error.message}
+                </UncontrolledAlert>
             }
             <h1 className="swimlane">Registered</h1>
             <Row>
@@ -143,17 +94,22 @@ const Extensions = () => {
             </Row>
             <Modal isOpen={isRegistrationDialogOpen} centered={true} toggle={toggleRegistrationDialog}>
                 <ModalHeader toggle={toggleRegistrationDialog}>Register {selectedExtension.displayName}</ModalHeader>
+                {registerMutation.isError &&
+                    <UncontrolledAlert color="danger" className="m-3 mb-0">
+                        {registerMutation.error.message}
+                    </UncontrolledAlert>
+                }
                 <div ref={registrationParamsRef}>
-                    { registrationError &&
-                        <Alert color="danger" className="m-3 mb-0">
-                            {registrationError}
-                        </Alert>
-                    }
                     <ModalBody dangerouslySetInnerHTML={{ __html: selectedExtension.htmlForRegistration }} />
                 </div>
                 <ModalFooter>
                     <Button color="secondary" onClick={toggleRegistrationDialog}>Close</Button>
-                    <Button color="primary" onClick={registerExtension}>Register</Button>
+                    <Button color="primary" onClick={register} disabled={registerMutation.isLoading}>Register</Button>
+                    {registerMutation.isLoading &&
+                        <Spinner color="light" size="sm">
+                            Loading...
+                        </Spinner>
+                    }
                 </ModalFooter>
             </Modal>
       </div>
