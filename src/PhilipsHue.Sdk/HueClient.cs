@@ -22,7 +22,9 @@ public class HueClient : IHueClient
     private enum ResourceType
     {
         Light,
-        ZigbeeConnectivity
+        ZigbeeConnectivity,
+        Room,
+        Zone
     }
 
     
@@ -94,34 +96,13 @@ public class HueClient : IHueClient
 
     public async Task<IEnumerable<PhilipsHueLight>> GetLightsAsync()
     {
-        _httpClient.DefaultRequestHeaders.Remove("hue-application-key");
-        _httpClient.DefaultRequestHeaders.Add("hue-application-key", _appKey);
-
-        var response = await _httpClient.GetAsync(GetUri(ResourceType.Light));
-        if (!response.IsSuccessStatusCode)
-        {
-            throw new PhilipsHueException($"Response from the bridge has unexpected HTTP status code: {response.StatusCode}");
-        }
-
-        var philipsHueResponse = await response.Content.ReadFromJsonAsync<PhilipsHueResponse<PhilipsHueLight>>();
-
-        return philipsHueResponse is not null ? philipsHueResponse.Data : new();
+        return await GetResourceAsync<PhilipsHueLight>(ResourceType.Light);
     }
 
     public async Task<PhilipsHueLight> GetLightAsync(Guid id)
     {
-        _httpClient.DefaultRequestHeaders.Remove("hue-application-key");
-        _httpClient.DefaultRequestHeaders.Add("hue-application-key", _appKey);
-
-        var response = await _httpClient.GetAsync(GetUri(ResourceType.Light, id));
-        if (!response.IsSuccessStatusCode)
-        {
-            throw new PhilipsHueException($"Response from the bridge has unexpected HTTP status code: {response.StatusCode}");
-        }
-
-        var philipsHueResponse = await response.Content.ReadFromJsonAsync<PhilipsHueResponse<PhilipsHueLight>>();
-
-        return philipsHueResponse is not null ? philipsHueResponse.Data.First() : new();
+        var lights = await GetResourceAsync<PhilipsHueLight>(ResourceType.Light, id);
+        return lights is not null && lights.Any() ? lights.First() : throw new PhilipsHueNotFoundException($"Light with id {id} not found");
     }
 
     public async Task<PhilipsHuePutResponse> UpdateLightAsync(Guid id, PhilipsHueUpdateLight data)
@@ -144,6 +125,30 @@ public class HueClient : IHueClient
 
         return philipsHueResponse is not null ? philipsHueResponse : new();
     }
+
+    public async Task<IEnumerable<PhilipsHueRoom>> GetRoomsAsync()
+    {
+        return await GetResourceAsync<PhilipsHueRoom>(ResourceType.Room);
+    }
+
+    public async Task<PhilipsHueRoom> GetRoomAsync(Guid id)
+    {
+        var rooms = await GetResourceAsync<PhilipsHueRoom>(ResourceType.Room, id);
+        return rooms is not null && rooms.Any() ? rooms.First() : throw new PhilipsHueNotFoundException($"Room with id {id} not found");
+    }
+
+    public async Task<IEnumerable<PhilipsHueZone>> GetZonesAsync()
+    {
+        return await GetResourceAsync<PhilipsHueZone>(ResourceType.Zone);
+    }
+
+    public async Task<PhilipsHueZone> GetZoneAsync(Guid id)
+    {
+        var zones = await GetResourceAsync<PhilipsHueZone>(ResourceType.Zone, id);
+        return zones is not null && zones.Any() ? zones.First() : throw new PhilipsHueNotFoundException($"Zone with id {id} not found");
+    }
+
+
 
     public async Task StartListeningForEventsAsync(CancellationToken? cancellationToken = null)
     {
@@ -196,6 +201,22 @@ public class HueClient : IHueClient
     }
 
 
+    public async Task<IEnumerable<T>> GetResourceAsync<T>(ResourceType type, Guid? id = null)
+    {
+        _httpClient.DefaultRequestHeaders.Remove("hue-application-key");
+        _httpClient.DefaultRequestHeaders.Add("hue-application-key", _appKey);
+
+        var response = await _httpClient.GetAsync(GetUri(type, id));
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new PhilipsHueException($"Response from the bridge has unexpected HTTP status code: {response.StatusCode}");
+        }
+
+        var philipsHueResponse = await response.Content.ReadFromJsonAsync<PhilipsHueResponse<T>>();
+
+        return philipsHueResponse is not null ? philipsHueResponse.Data : new();
+    }
+
     private void Unregister()
     {
         if (!BridgeRegistered)
@@ -212,13 +233,15 @@ public class HueClient : IHueClient
         var appKeyPart = string.IsNullOrWhiteSpace(_appKey) ? "" : $"{_appKey}/";
         return new Uri($"https://{_ip}/api/{appKeyPart}");
     }
-
+    
     private Uri GetUri(ResourceType type, Guid? id = null)
     {
         var resourceTypePart = type switch
         {
            ResourceType.Light => "/light",
-           ResourceType.ZigbeeConnectivity => "/zigbee_connectivity",
+           ResourceType.Room => "/room",
+           ResourceType.Zone => "/zone",
+            ResourceType.ZigbeeConnectivity => "/zigbee_connectivity",
             _ => ""
         };
         var resourceIdPart = id is null ? "" : $"/{id}";
