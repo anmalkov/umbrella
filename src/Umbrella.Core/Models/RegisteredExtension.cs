@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Umbrella.Core.Models;
 
-public class RegisteredExtension
+public class RegisteredExtension : IStorableItem
 {
     public string Id { get; init; }
     public Dictionary<string, string?>? Parameters { get; set; }

@@ -201,7 +201,7 @@ public class HueClient : IHueClient
     }
 
 
-    public async Task<IEnumerable<T>> GetResourceAsync<T>(ResourceType type, Guid? id = null)
+    private async Task<IEnumerable<T>> GetResourceAsync<T>(ResourceType type, Guid? id = null)
     {
         _httpClient.DefaultRequestHeaders.Remove("hue-application-key");
         _httpClient.DefaultRequestHeaders.Add("hue-application-key", _appKey);

@@ -58,7 +58,7 @@ namespace Umbrella.Core.Tests
 
             var loadedExtensions = await repository.GetAllAsync();
 
-            Assert.Equal(extensions.Count, loadedExtensions?.Count);
+            Assert.Equal(extensions.Count, loadedExtensions?.Count());
 
             foreach (var extension in extensions)
             {
@@ -99,7 +99,7 @@ namespace Umbrella.Core.Tests
 
             Assert.NotNull(loadedExtensions);
             Assert.Single(loadedExtensions!);
-            Assert.Equivalent(extensions[1], loadedExtensions![0]);
+            Assert.Equivalent(extensions[1], loadedExtensions!.First());
         }
     }
 }

@@ -10,7 +10,7 @@ namespace Umbrella.Core.Repositories;
 
 public interface IExtensionRepository
 {
-    Task<List<RegisteredExtension>?> GetAllAsync();
+    Task<IEnumerable<RegisteredExtension>?> GetAllAsync();
     Task<RegisteredExtension?> GetAsync(string id);
 
     Task AddAsync(RegisteredExtension extension);
