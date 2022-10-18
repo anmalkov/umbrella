@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Umbrella.Core.Models;
 
-public class Group
+public class Group : IStorableItem
 {
     public string Id { get; set; }
     public string Name { get; set; }

@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Umbrella.Core.Repositories;
 
 namespace Umbrella.Core.Models;
 
-public class Area
+public class Area : IStorableItem
 {
     public string Id { get; set; }
     public string Name { get; set; }
