@@ -25,6 +25,12 @@ const NavMenu = (props) => {
                 <NavLink tag={Link} className="text-light" to="/entities">Entities</NavLink>
               </NavItem>
               <NavItem>
+                <NavLink tag={Link} className="text-light" to="/areas">Areas</NavLink>
+              </NavItem>
+              <NavItem>
+                <NavLink tag={Link} className="text-light" to="/groups">Groups</NavLink>
+              </NavItem>
+              <NavItem>
                 <NavLink tag={Link} className="text-light" to="/extensions">Extensions</NavLink>
               </NavItem>
             </ul>

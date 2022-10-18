@@ -47,6 +47,8 @@ app.MediateGet<GetExtensionsRequest>("/api/extensions");
 app.MediatePost<RegisterExtensionRequest>("/api/extensions/{id}");
 app.MediateDelete<UnregisterExtensionRequest>("/api/extensions/{id}");
 app.MediateGet<GetEntitiesRequest>("/api/entities");
+app.MediateGet<GetAreasRequest>("/api/areas");
+app.MediateGet<GetGroupsRequest>("/api/groups");
 
 app.MapFallbackToFile("index.html");
 
