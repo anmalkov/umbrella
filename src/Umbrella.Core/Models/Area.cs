@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Umbrella.Core.Repositories;
 
@@ -15,6 +16,7 @@ public class Area : IStorableItem
     public double? Longitude { get; set; }
     public double? Latitude { get; set; }
 
+    [JsonIgnore]
     public bool InsideHouse => !Longitude.HasValue && !Latitude.HasValue;
 
     public Area(string id, string name)

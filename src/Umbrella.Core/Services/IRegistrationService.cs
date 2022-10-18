@@ -6,4 +6,6 @@ namespace Umbrella.Core.Services;
 public interface IRegistrationService
 {
     Task RegisterEntityAsync(IEntity entity, string extensionId);
+    Task AddAreaAsync(Area area, string extensionId);
+    Task AddGroupAsync(Group group, string extensionId);
 }

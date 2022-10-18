@@ -5,7 +5,7 @@ using Umbrella.Core.Services;
 
 namespace Umbrella.Core.Tests;
 
-public class CoreServiceTests
+public class RegistrationServiceTests
 {
     [Fact]
     public async Task RegisterEntity_should_assign_owner()
@@ -16,7 +16,7 @@ public class CoreServiceTests
 
         var entitiesService = new Mock<IEntitiesService>();
 
-        var service = new RegistrationService(entitiesService.Object);
+        var service = new RegistrationService(entitiesService.Object, null, null);
         await service.RegisterEntityAsync(entity, extensionId);
 
         entitiesService.Verify(s => s.RegisterAsync(It.Is<IEntity>(e => e.Owner == extensionId)));

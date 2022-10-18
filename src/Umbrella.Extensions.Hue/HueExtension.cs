@@ -1,6 +1,8 @@
 ﻿using PhilipsHue.Sdk;
 using PhilipsHue.Sdk.Models;
 using System.Text.Json;
+using System.Transactions;
+using System.Xml.Linq;
 using Umbrella.Core.Events;
 using Umbrella.Core.Extensions;
 using Umbrella.Core.Models;
@@ -9,6 +11,7 @@ using Umbrella.Core.Services;
 namespace Umbrella.Extensions.Hue;
 
 internal record LightId(Guid HueId, Guid HueDeviceId, string EntityId);
+internal record AreaId(string id, List<Guid> ChildrenHueRid);
 
 public class HueExtension : IExtension
 {
@@ -20,7 +23,7 @@ public class HueExtension : IExtension
     private const string DeviceName = "ExtensionHue";
 
     private readonly HttpClient _httpClient;
-    private readonly IRegistrationService _coreService;
+    private readonly IRegistrationService _registrationService;
     private readonly IEventsService _eventsService;
 
     private IHueClient? _hueClient;
@@ -58,7 +61,7 @@ public class HueExtension : IExtension
         {
             _httpClient = httpClient;
         }
-        _coreService = coreService;
+        _registrationService = coreService;
         _eventsService = eventsService;
     }
     
@@ -88,17 +91,68 @@ public class HueExtension : IExtension
         parameters.Add(AppKeyParameterName, regInfo?.ApplicationKey);
         parameters.Add(ClientKeyParameterName, regInfo?.ApplicationKey);
 
+        var areaIds = await AddAllAreas();
+
+        var lightsIds = await AddAllLights(areaIds);
+        parameters.Add(LightsIdsParameterName, JsonSerializer.Serialize(lightsIds));
+
+        await AddAllGroups(lightsIds);
+    }
+
+    private async Task AddAllGroups(IEnumerable<LightId> lightIds)
+    {
+        if (_hueClient is null)
+        {
+            return;
+        }
+
+        var zones = await _hueClient.GetZonesAsync();
+        int zoneIndex = 1;
+        foreach (var zone in zones)
+        {
+            var entityIds = zone.Children.Where(z => lightIds.Any(l => l.HueId == z.Rid)).Select(z => lightIds.First(l => l.HueId == z.Rid).EntityId);
+            var group = MapZoneToGroup(zone, zoneIndex++, entityIds);
+            await _registrationService.AddGroupAsync(group, Id);
+        }
+    }
+
+    private async Task<IEnumerable<AreaId>> AddAllAreas()
+    {
+        if (_hueClient is null)
+        {
+            return new List<AreaId>();
+        }
+
+        var rooms = await _hueClient.GetRoomsAsync();
+        int roomIndex = 1;
+        var areasIds = new List<AreaId>();
+        foreach (var room in rooms)
+        {
+            var area = MapRoomToArea(room, roomIndex++);
+            await _registrationService.AddAreaAsync(area, Id);
+            areasIds.Add(new AreaId(area.Id, room.Children.Where(c => c.Rtype == "device").Select(c => c.Rid).ToList()));
+        }
+        return areasIds;
+    }
+
+    private async Task<List<LightId>> AddAllLights(IEnumerable<AreaId> areaIds)
+    {
+        if (_hueClient is null)
+        {
+            return new();
+        }
+        
         var lights = await _hueClient.GetLightsAsync();
         int lightIndex = 1;
         var lightsIds = new List<LightId>();
         foreach (var light in lights)
         {
-            var entity = MapLightToEntity(light, lightIndex++);
-            await _coreService.RegisterEntityAsync(entity, Id);
+            var areaId = areaIds.Where(a => a.ChildrenHueRid.Any(d => d == light.Owner.Rid)).Select(a => a.id).FirstOrDefault();
+            var entity = MapLightToEntity(light, lightIndex++, areaId);
+            await _registrationService.RegisterEntityAsync(entity, Id);
             lightsIds.Add(new LightId(light.Id, light.Owner.Rid, entity.Id));
         }
-
-        parameters.Add(LightsIdsParameterName, JsonSerializer.Serialize(lightsIds));
+        return lightsIds;
     }
 
     public Task UnregisterAsync(Dictionary<string, string?>? parameters)
@@ -240,23 +294,53 @@ public class HueExtension : IExtension
         })).Result;
     }
 
-    private LightEntity MapLightToEntity(PhilipsHueLight light, int index)
-    {
-        return new LightEntity(GenerateEntityId(light, index))
-        {
-            Name = light.Metadata?.Name ?? $"Light {index}",
-            Enabled = true,
-            MinColorTemperature = light.ColorTemperature?.MirekSchema?.MirekMinimum,
-            MaxColorTemperature = light.ColorTemperature?.MirekSchema?.MirekMinimum
-        };
-    }
     
-    private string GenerateEntityId(PhilipsHueLight light, int index)
+    private string GenerateEntityId(string name)
     {
-        var name = light.Metadata?.Name ?? $"Light {index}";
         name = name.ToLower().Replace(' ', '_');
         
         return $"light.{Id}.{name}";
+    }
+
+    private string GenerateAreaId(string name)
+    {
+        name = name.ToLower().Replace(' ', '_');
+
+        return $"area.{name}";
+    }
+    
+    private string GenerateGroupId(string name)
+    {
+        name = name.ToLower().Replace(' ', '_');
+
+        return $"group.{name}";
+    }
+
+    private LightEntity MapLightToEntity(PhilipsHueLight light, int index, string? areaId)
+    {
+        var name = light.Metadata?.Name ?? $"Light {index}";
+        return new LightEntity(GenerateEntityId(name))
+        {
+            Name = name,
+            AreaId = areaId,
+            Enabled = true,
+            MinColorTemperature = light.ColorTemperature?.MirekSchema?.MirekMinimum,
+            MaxColorTemperature = light.ColorTemperature?.MirekSchema?.MirekMaximum,
+        };
+    }
+
+    private Area MapRoomToArea(PhilipsHueRoom room, int index)
+    {
+        var name = room.Metadata?.Name ?? $"Area {index}";
+        return new Area(GenerateAreaId(name), name);
+    }
+
+    private Group MapZoneToGroup(PhilipsHueZone zone, int index, IEnumerable<string> entities)
+    {
+        var name = zone.Metadata?.Name ?? $"Group {index}";
+        return new Group(GenerateGroupId(name), name) {
+            Entities = new List<string>(entities)
+        };
     }
 
 }

@@ -12,6 +12,7 @@ public interface IEntity
     string? Name { get; }
     string? Icon { get; }
     string? Owner { get; set; }
+    string? AreaId { get; set; }
     bool Enabled { get; }
     EntityType Type { get; }
 }

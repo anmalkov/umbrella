@@ -19,7 +19,6 @@ export const registerExtension = async (id, parameters) => {
 }
 
 export const unregisterExtension = async (id) => {
-    throw Error("Unreg Aborted");
     const request = {
         method: 'DELETE'
     };

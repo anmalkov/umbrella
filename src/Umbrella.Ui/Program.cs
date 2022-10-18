@@ -23,10 +23,14 @@ builder.Services.AddSingleton<ICoreService, CoreService>();
 builder.Services.AddSingleton<IExtensionsService, ExtensionsService>();
 builder.Services.AddSingleton<IRegistrationService, RegistrationService>();
 builder.Services.AddSingleton<IEntitiesService, EntitiesService>();
+builder.Services.AddSingleton<IAreasService, AreasService>();
+builder.Services.AddSingleton<IGroupsService, GroupsService>();
 
 builder.Services.AddSingleton<IExtensionRepository, ExtensionRepository>();
 builder.Services.AddSingleton<IConfigurationRepository, ConfigurationRepository>();
 builder.Services.AddSingleton<IEntitiesRepository, EntitiesRepository>();
+builder.Services.AddSingleton<IAreasRepository, AreasRepository>();
+builder.Services.AddSingleton<IGroupsRepository, GroupsRepository>();
 
 var app = builder.Build();
 
