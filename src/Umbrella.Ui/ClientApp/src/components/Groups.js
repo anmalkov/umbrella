@@ -6,7 +6,7 @@ import { fetchGroups } from '../fetchers/groups';
 const Groups = () => {
 
     const { isError, isLoading, data, error } = useQuery(['groups'], fetchGroups, { staleTime: 60000 });
-    const areasList = data
+    const groupsList = data
 
     if (isLoading) {
         return (
@@ -18,7 +18,7 @@ const Groups = () => {
         );
     }    
 
-    if (areasList.length === 0) {
+    if (groupsList.length === 0) {
         return (
             <div>
                 <p>There are no entities registered yet</p>
@@ -42,7 +42,7 @@ const Groups = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {areasList.sort((a, b) => a.name > b.name ? 1 : -1).map(group => (
+                    {groupsList.sort((a, b) => a.name > b.name ? 1 : -1).map(group => (
                         <tr key={group.id}>
                             <td></td>
                             <td>{group.name}</td>

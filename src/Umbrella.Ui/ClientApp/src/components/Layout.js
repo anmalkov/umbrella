@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { Container } from 'reactstrap';
 import NavMenu from './NavMenu';
 import Screensaver from './Screensaver';
@@ -34,7 +34,7 @@ const Layout = (props) => {
                 <Screensaver hideScreensaver={hideScreensaver} />
             }
             <NavMenu />
-            <Container tag="main">
+            <Container tag="main" fluid>
                 {props.children}
             </Container>
         </div>

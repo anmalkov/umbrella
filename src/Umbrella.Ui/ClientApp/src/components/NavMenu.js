@@ -13,7 +13,7 @@ const NavMenu = (props) => {
 
     return (
       <header>
-        <Navbar className="navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark box-shadow mb-3" container dark>
+        <Navbar className="navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark box-shadow mb-3" dark>
           <NavbarBrand tag={Link} to="/"><b>U</b></NavbarBrand>
           <NavbarToggler onClick={toggleNavbar} className="mr-2" />
           <Collapse className="d-sm-inline-flex flex-sm-row-reverse" isOpen={!collapsed} navbar>
