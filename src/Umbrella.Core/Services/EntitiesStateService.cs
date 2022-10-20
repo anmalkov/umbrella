@@ -36,6 +36,15 @@ public class EntitiesStateService : IEntitiesStateService
         return _state.ContainsKey(id) ? _state[id].State : default;
     }
 
+    public IDictionary<string, IEntityState>? GetStates()
+    {
+        if (!_state.Any())
+        {
+            return default;
+        }
+        return _state.ToDictionary(s => s.Key, s => s.Value.State);
+    }
+
     public void StartMonitoring()
     {
         _eventsService.Subscribe(EventNames.EntityStateChanged, OnChangeState);

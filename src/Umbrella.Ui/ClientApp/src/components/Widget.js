@@ -4,6 +4,7 @@ import { useQuery } from 'react-query';
 import { fetchEntities } from '../fetchers/entities';
 import { fetchGroups } from '../fetchers/groups';
 import { fetchAreas } from '../fetchers/areas';
+import { fetchStates } from '../fetchers/states';
 import WidgetLight from './WidgetLight';
 import WidgetEntities from './WidgetEntities';
 
@@ -12,14 +13,18 @@ const Widget = ({ target }) => {
     const entitiesQuery = useQuery(['entities'], fetchEntities, { staleTime: 60000 });
     const entitiesList = entitiesQuery.data;
 
+    const statesQuery = useQuery(['states'], fetchStates, { staleTime: 60000 });
+    const statesList = statesQuery.data
+
     const groupsQuery = useQuery(['groups'], fetchGroups, { staleTime: 60000 });
     const groupsList = groupsQuery.data;
 
     const areasQuery = useQuery(['areas'], fetchAreas, { staleTime: 60000 });
     const areasList = areasQuery.data
-    
-    const isError = entitiesQuery.isError || groupsQuery.isError || areasQuery.isError;
-    const isLoading = entitiesQuery.isLoading || groupsQuery.isLoading || areasQuery.isLoading;
+
+
+    const isError = entitiesQuery.isError || statesQuery.isError || groupsQuery.isError || areasQuery.isError;
+    const isLoading = entitiesQuery.isLoading || statesQuery.isLoading || groupsQuery.isLoading || areasQuery.isLoading;
 
     const getWidget = () => {
         if (isLoading) {
@@ -28,7 +33,7 @@ const Widget = ({ target }) => {
         switch (target.type) {
             default:
             case 'entity':
-                if (!entitiesList) {
+                if (!entitiesList || !statesList) {
                     return;
                 }
                 const entity = entitiesList.find(e => e.id === target.id);
@@ -39,13 +44,14 @@ const Widget = ({ target }) => {
                         </CardBody>
                     );
                 }
+                const state = (statesList && statesList.find(s => s.id === entity.id).state) || {};
                 switch (entity.type) {
                     default:
                     case 'light':
-                        return (<WidgetLight entity={entity} />);
+                        return (<WidgetLight entity={entity} state={state} />);
                 }
             case 'group':
-                if (!groupsList || !entitiesList) {
+                if (!groupsList || !entitiesList || !statesList) {
                     return;
                 }
                 const group = groupsList.find(e => e.id === target.id);
@@ -57,9 +63,10 @@ const Widget = ({ target }) => {
                     );
                 }
                 const groupEntities = group.entities.map(id => entitiesList.find(e => e.id === id));
-                return (<WidgetEntities name={group.name} entities={groupEntities} />);
+                const groupStates = group.entities.map(id => (statesList && statesList.find(s => s.id === id)) || {});
+                return (<WidgetEntities name={group.name} entities={groupEntities} states={groupStates} />);
             case 'area':
-                if (!areasList || !entitiesList) {
+                if (!areasList || !entitiesList || !statesList) {
                     return;
                 }
                 const area = areasList.find(e => e.id === target.id);
@@ -71,7 +78,8 @@ const Widget = ({ target }) => {
                     );
                 }
                 const areaEntities = entitiesList.filter(e => e.areaId === area.id);
-                return (<WidgetEntities name={area.name} entities={areaEntities} />);
+                const areaStates = areaEntities.map(e => (statesList && statesList.find(s => s.id === e.id)) || {});
+                return (<WidgetEntities name={area.name} entities={areaEntities} states={areaStates} />);
         }
     }
 
@@ -93,9 +101,10 @@ const Widget = ({ target }) => {
                 <CardBody>
                     <Alert color="danger">
                         {entitiesQuery.error ? entitiesQuery.error.message
-                            : groupsQuery.error ? groupsQuery.error.message
-                                : areasQuery.error ? areasQuery.error.message
-                                    : 'Unknown error'}
+                            : statesQuery.error ? statesQuery.error.message
+                                : groupsQuery.error ? groupsQuery.error.message
+                                    : areasQuery.error ? areasQuery.error.message
+                                        : 'Unknown error'}
                     </Alert>
                 </CardBody>
             </Card>

@@ -43,8 +43,12 @@ public sealed class EntitiesService : IEntitiesService
         return _stateService.GetState(id);
     }
 
+    public IDictionary<string, IEntityState>? GetStates()
+    {
+        return _stateService.GetStates();
+    }
 
-
+    
     public async Task RegisterAsync(IEntity entity)
     {
         if (await _entitiesRepository.GetAsync(entity.Id) is not null)

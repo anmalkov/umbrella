@@ -13,4 +13,5 @@ public interface IEntitiesStateService
     void StopMonitoring();
     
     IEntityState? GetState(string id);
+    IDictionary<string, IEntityState>? GetStates();
 }

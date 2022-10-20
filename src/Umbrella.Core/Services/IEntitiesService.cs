@@ -18,4 +18,5 @@ public interface IEntitiesService
     Task<List<IEntity>?> GetAsync(EntityType type);
 	Task<int> GetCount(string owner);
     IEntityState? GetState(string id);
+    IDictionary<string, IEntityState>? GetStates();
 }
