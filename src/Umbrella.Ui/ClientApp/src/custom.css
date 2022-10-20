@@ -5,6 +5,7 @@
     --swimlane-background: #333333;
     --error-background: #660000;
     --text-color: #cccccc;
+    --text-color-disabled: #666666;
     --divider-color: #444444;
 }
 
@@ -65,6 +66,10 @@ th {
     background-color: var(--error-background);
     border: none;
     color: var(--text-color);
+}
+
+.disabled {
+    color: var(--text-color-disabled);
 }
 
 
