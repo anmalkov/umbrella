@@ -1,11 +1,14 @@
 using MediatR;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 using Umbrella.Core.Extensions;
 using Umbrella.Core.Repositories;
 using Umbrella.Core.Services;
 using Umbrella.Extensions.Hue;
 using Umbrella.Extensions.Xiaomi;
 using Umbrella.Ui.Extensions;
+using Umbrella.Ui.Hubs;
 using Umbrella.Ui.Requests;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddMediatR(m => m.AsScoped(), typeof(Program));
 
 //builder.Services.AddControllersWithViews();
+builder.Services.AddSignalR();
 
 builder.Services.AddSingleton<IExtension, HueExtension>();
 builder.Services.AddSingleton<IExtension, XiaomiExtension>();
@@ -51,10 +55,16 @@ app.MediateGet<GetEntitiesStatesRequest>("/api/entities/states");
 app.MediateGet<GetAreasRequest>("/api/areas");
 app.MediateGet<GetGroupsRequest>("/api/groups");
 
+app.MapHub<EntityStateHub>("/sr/stateHub");
+
 app.MapFallbackToFile("index.html");
 
 var coreService = app.Services.GetService<ICoreService>();
-await coreService!.StartAsync();
+await coreService!.StartAsync(async (id, state) =>
+{
+    var hub = app.Services.GetService<IHubContext<EntityStateHub>>();
+    await hub!.Clients.All.SendAsync("ReceiveStateUpdate", id, state);
+});
 
 app.Run();
 

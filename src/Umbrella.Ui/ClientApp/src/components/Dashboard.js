@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Row } from 'reactstrap';
+import { HubConnectionBuilder } from '@microsoft/signalr';
+import { useQueryClient } from 'react-query';
 import Widget from './Widget';
 
 const Dashboard = () => {
@@ -13,6 +15,37 @@ const Dashboard = () => {
     ];
 
     const [widgetsList, setWidgetsList] = useState(widgets);
+    const [connection, setConnection] = useState(null);
+
+    const queryClient = useQueryClient();
+
+    useEffect(() => {
+        const newConnection = new HubConnectionBuilder()
+            .withUrl("/sr/stateHub")
+            .withAutomaticReconnect()
+            .build();
+        setConnection(newConnection);
+    }, []);
+
+    useEffect(() => {
+        const connect = async () => {
+            if (connection) {
+                try {
+                    await connection.start();
+                    console.log('Connected!');
+                    connection.on('ReceiveStateUpdate', (id, state) => {
+                        console.log('ReceiveStateUpdate', id, state);
+                        queryClient.invalidateQueries(['states']);
+                        queryClient.refetchQueries('states', { force: true });
+                    });
+                }
+                catch (e) {
+                    console.log('Connection failed: ', e);
+                }
+            }
+        }
+        connect();
+    }, [connection]);        
 
     if (widgetsList.length === 0) {
         return (

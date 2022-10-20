@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Umbrella.Core.Extensions;
+using Umbrella.Core.Models;
 
 namespace Umbrella.Core.Services;
 
@@ -20,8 +21,12 @@ public class CoreService : ICoreService
         _entitiesStateService = entitiesStateService;
     }
     
-    public async Task StartAsync()
+    public async Task StartAsync(Action<string, IEntityState>? entityStateUpdated = null)
     {
+        if (entityStateUpdated is not null)
+        {
+            _entitiesStateService.EntityStateUpdated = entityStateUpdated;
+        }
         _entitiesStateService.StartMonitoring();
         var registeredExtensions = await _extensionsService.GetRegisteredAsync();
         if (registeredExtensions is not null)

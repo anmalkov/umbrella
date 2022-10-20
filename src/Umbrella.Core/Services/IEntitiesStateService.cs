@@ -9,6 +9,8 @@ namespace Umbrella.Core.Services;
 
 public interface IEntitiesStateService
 {
+    Action<string, IEntityState>? EntityStateUpdated { get; set; }
+    
     void StartMonitoring();
     void StopMonitoring();
     

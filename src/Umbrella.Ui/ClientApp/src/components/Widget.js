@@ -13,7 +13,7 @@ const Widget = ({ target }) => {
     const entitiesQuery = useQuery(['entities'], fetchEntities, { staleTime: 60000 });
     const entitiesList = entitiesQuery.data;
 
-    const statesQuery = useQuery(['states'], fetchStates, { staleTime: 60000 });
+    const statesQuery = useQuery(['states'], fetchStates);
     const statesList = statesQuery.data
 
     const groupsQuery = useQuery(['groups'], fetchGroups, { staleTime: 60000 });

@@ -26,6 +26,8 @@ public class EntitiesStateService : IEntitiesStateService
     private readonly IEventsService _eventsService;
     private readonly ConcurrentDictionary<string, StateHistory> _state = new();
 
+    public Action<string, IEntityState>? EntityStateUpdated { get; set; } = null;
+
     public EntitiesStateService(IEventsService eventsService)
     {
         _eventsService = eventsService;
@@ -73,5 +75,10 @@ public class EntitiesStateService : IEntitiesStateService
         var stateHistory = _state[entityId];
         stateHistory.OldState = stateHistory.State.Clone();
         stateHistory.State.UpdateProperties(stateChangedEvent.State);
+
+        if (EntityStateUpdated is not null)
+        {
+            EntityStateUpdated.Invoke(entityId, stateHistory.State);
+        }
     }
 }
