@@ -148,8 +148,12 @@ public class HueClient : IHueClient
         return zones is not null && zones.Any() ? zones.First() : throw new PhilipsHueNotFoundException($"Zone with id {id} not found");
     }
 
+    public async Task<IEnumerable<PhilipsHueZigbeeConnectivity>> GetZigbeeConnectivityAsync()
+    {
+        return await GetResourceAsync<PhilipsHueZigbeeConnectivity>(ResourceType.ZigbeeConnectivity);
+    }
 
-
+    
     public async Task StartListeningForEventsAsync(CancellationToken? cancellationToken = null)
     {
         StopListeningForEvents();
@@ -241,7 +245,7 @@ public class HueClient : IHueClient
            ResourceType.Light => "/light",
            ResourceType.Room => "/room",
            ResourceType.Zone => "/zone",
-            ResourceType.ZigbeeConnectivity => "/zigbee_connectivity",
+           ResourceType.ZigbeeConnectivity => "/zigbee_connectivity",
             _ => ""
         };
         var resourceIdPart = id is null ? "" : $"/{id}";

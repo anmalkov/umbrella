@@ -13,6 +13,7 @@ public interface IHueClient : IDisposable
     Task<PhilipsHueRoom> GetRoomAsync(Guid id);
     Task<IEnumerable<PhilipsHueZone>> GetZonesAsync();
     Task<PhilipsHueZone> GetZoneAsync(Guid id);
+    Task<IEnumerable<PhilipsHueZigbeeConnectivity>> GetZigbeeConnectivityAsync();
 
     Task<PhilipsHuePutResponse> UpdateLightAsync(Guid id, PhilipsHueUpdateLight data);
 

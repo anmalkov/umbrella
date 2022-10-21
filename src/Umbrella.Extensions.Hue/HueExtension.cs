@@ -251,6 +251,7 @@ public class HueExtension : IExtension
             return;
         }
 
+        var connectivities = await _hueClient.GetZigbeeConnectivityAsync();
         var lights = await _hueClient.GetLightsAsync();
         foreach (var lightId in _lightsIds)
         {
@@ -259,8 +260,10 @@ public class HueExtension : IExtension
             {
                 continue;
             }
+            var lightConnectivity = connectivities.FirstOrDefault(c => c.Owner.Rid == lightId.HueDeviceId);
             var state = new LightEntityState
             {
+                Connected = lightConnectivity is not null && lightConnectivity.Status == "connected",
                 TurnedOn = light.On?.TurnedOn,
                 Brightness = (byte?)light.Dimming?.Brightness,
                 ColorTemperature = light.ColorTemperature?.Mirek
