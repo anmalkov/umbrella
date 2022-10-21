@@ -12,3 +12,8 @@
   color: cornflowerblue;
   z-index: 1;
 }
+
+.screensaver > img {
+    width: 100%;
+    height: auto;
+}

@@ -54,8 +54,12 @@ app.MediateDelete<UnregisterExtensionRequest>("/api/extensions/{id}");
 app.MediateGet<GetEntitiesRequest>("/api/entities");
 app.MediateGet<GetEntitiesStatesRequest>("/api/entities/states");
 app.MediatePut<SetEntitiesStatesRequest>("/api/entities/states");
+
 app.MediateGet<GetAreasRequest>("/api/areas");
+
 app.MediateGet<GetGroupsRequest>("/api/groups");
+
+app.MediateGet<GetPhotoRequest>("/api/photos");
 
 app.MapHub<EntityStateHub>("/sr/stateHub");
 
