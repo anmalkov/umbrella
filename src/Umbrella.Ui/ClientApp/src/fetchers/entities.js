@@ -11,11 +11,6 @@ export const setLightState = async (id, turnedOn, brightness, colorTemperature) 
         brightness: brightness != null ? Number(brightness) : null,
         colorTemperature: colorTemperature != null ? Number(colorTemperature) : null
     };
-    //const params = [
-    //    { key: "turnedOn", value: turnedOn != null ? String(turnedOn) : null },
-    //    { key: "brightness", value: brightness != null ? String(brightness) : null },
-    //    { key: "colorTemperature", value: colorTemperature != null ? String(colorTemperature) : null }
-    //];
     await updateEntityState(id, params);
 }
 

@@ -9,7 +9,7 @@ const Dashboard = () => {
     const widgets = [
         { id: 'w1', col: 1, position: 1, target: { type: 'entity', id: 'light.hue.test' } },
         { id: 'w2', col: 2, position: 2, target: { type: 'group', id: 'group.kitchen' } },
-        { id: 'w3', col: 2, position: 1, target: { type: 'entity', id: 'hue.light.test1' } },
+        { id: 'w3', col: 2, position: 1, target: { type: 'group', id: 'group.children' } },
         { id: 'w4', col: 3, position: 1, target: { type: 'area', id: 'area.table' } },
         { id: 'w5', col: 4, position: 1, target: { type: 'area', id: 'area.tv' } },
     ];
