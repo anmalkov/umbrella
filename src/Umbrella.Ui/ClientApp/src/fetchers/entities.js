@@ -6,22 +6,29 @@ export const fetchEntities = async () => {
 }
 
 export const setLightState = async (id, turnedOn, brightness, colorTemperature) => {
-    const params = {
-        turnedOn,
-        brightness: brightness != null ? Number(brightness) : null,
-        colorTemperature: colorTemperature != null ? Number(colorTemperature) : null
-    };
-    await updateEntityState(id, params);
+    await setLightsStates([{ id, turnedOn, brightness, colorTemperature }]);
 }
 
-const updateEntityState = async (id, params) => {
-    console.log("updateState", params);
+export const setLightsStates = async (states) => {
+    const params = states.map(s => ({
+        key: s.id,
+        value: {
+            turnedOn: s.turnedOn,
+            brightness: s.brightness != null ? Number(s.brightness) : null,
+            colorTemperature: s.colorTemperature != null ? Number(s.colorTemperature) : null
+        }
+    }));
+    console.log(params);
+    await updateEntitiesStates(params);
+}
+
+const updateEntitiesStates = async (params) => {
     const request = {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ state: params })
+        body: JSON.stringify({ states: params })
     };
-    const response = await fetch(`api/entities/${id}/state`, request);
+    const response = await fetch(`api/entities/states`, request);
     if (response.status !== 200) {
         const result = await response.json();
         throw Error(result.detail);

@@ -5,12 +5,11 @@ using Umbrella.Core.Services;
 
 namespace Umbrella.Ui.Requests;
 
-public record struct SetEntityStateRequestBody(
-    object State
+public record struct SetEntitiesStatesRequestBody(
+    IEnumerable<KeyValuePair<string, object>>? States
 );
 
-public record struct SetEntityStateRequest(
-    string Id,
+public record struct SetEntitiesStatesRequest(
     [FromBody]
-    SetEntityStateRequestBody Body
+    SetEntitiesStatesRequestBody Body
 ) : IHttpRequest;

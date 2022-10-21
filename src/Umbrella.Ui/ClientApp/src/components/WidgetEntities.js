@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Row, Col, Input, CardBody, CardTitle, UncontrolledAlert } from 'reactstrap';
 import { useMutation } from 'react-query';
-import { setLightState } from '../fetchers/entities';
+import { setLightsStates, setLightState } from '../fetchers/entities';
 
 const WidgetEntities = ({ name, entities, states }) => {
 
@@ -39,7 +39,11 @@ const WidgetEntities = ({ name, entities, states }) => {
 
     const handleAllTurnedOnChange = (e) => {
         const turnOn = e.target.checked;
-        states.filter(s => s.state.connected && s.state.turnedOn === !turnOn).forEach(s => setState(s.id, turnOn, null, null));
+        //states.filter(s => s.state.connected && s.state.turnedOn === !turnOn).forEach(s => setState(s.id, turnOn, null, null));
+        var props = states.filter(s => s.state.connected && s.state.turnedOn === !turnOn)
+            .map(s => ({ id: s.id, turnedOn: turnOn }));
+        console.log(props);
+        setLightsStates(props);
     }
 
     const handleTurnedOnChange = (id, e) => {
