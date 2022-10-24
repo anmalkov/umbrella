@@ -64,6 +64,7 @@ app.MediateGet<GetGroupsRequest>("/api/groups");
 app.MediateGet<GetDashboardsRequest>("/api/dashboards");
 app.MediatePost<CreateDashboardRequest>("/api/dashboards");
 app.MediatePut<UpdateDashboardRequest>("/api/dashboards/{id}");
+app.MediateDelete<DeleteDashboardRequest>("/api/dashboards/{id}");
 
 app.MediateGet<GetPhotoRequest>("/api/photos");
 

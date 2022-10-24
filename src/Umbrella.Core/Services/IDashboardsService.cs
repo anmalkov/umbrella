@@ -13,4 +13,5 @@ public interface IDashboardsService
     Task AddAsync(Dashboard dashboard);
     Task UpdateAsync(Dashboard dashboard);
     Task<IEnumerable<Dashboard>> GetAllAsync();
+    Task DeleteAsync(string id);
 }

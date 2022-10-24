@@ -30,3 +30,15 @@ export const updateDashboard = async (id, name, widgets) => {
         throw Error(result.detail);
     }
 }
+
+export const deleteDashboard = async (id) => {
+    const request = {
+        method: 'DELETE'
+    };
+    const response = await fetch(`api/dashboards/${id}`, request);
+    if (response.status !== 200) {
+        const result = await response.json();
+        throw Error(result.detail);
+    }
+}
+

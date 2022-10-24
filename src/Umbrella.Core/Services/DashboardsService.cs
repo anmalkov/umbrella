@@ -27,4 +27,9 @@ public class DashboardsService : IDashboardsService
     {
         await _dashboardRepository.UpdateAsync(dashboard);
     }
+
+    public async Task DeleteAsync(string id)
+    {
+        await _dashboardRepository.DeleteAync(id);
+    }
 }

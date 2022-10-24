@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Row, Col, Spinner, Button, Input, Form, FormGroup, Label } from 'reactstrap';
 import { HubConnectionBuilder } from '@microsoft/signalr';
 import { useQueryClient, useQuery, useMutation } from 'react-query';
-import { fetchDashboards, createDashboard, updateDashboard } from '../fetchers/dashboards';
+import { fetchDashboards, createDashboard, updateDashboard, deleteDashboard } from '../fetchers/dashboards';
 import ToolBar from './ToolBar';
 import Widget from './Widget';
 
@@ -25,8 +25,11 @@ const Dashboard = () => {
     });
 
     const updateMutation = useMutation(({ id, name, widgets }) => {
-        console.log('update');
         return updateDashboard(id, name, widgets);
+    });
+
+    const deleteMutation = useMutation((id) => {
+        return deleteDashboard(id);
     });
 
     useEffect(() => {
@@ -87,6 +90,20 @@ const Dashboard = () => {
         setIsEdit(false);
     }
 
+    const deleteHandler = async () => {
+        if (!window.confirm(`Do you want to delete dashboard '${currentDashboard.name}' ?`)) {
+            return;
+        }
+        try {
+            await deleteMutation.mutateAsync(currentDashboard.id);
+            queryClient.invalidateQueries(['dashboards']);
+            queryClient.refetchQueries('dashboards', { force: true });
+        }
+        catch { }
+        setCurrentDashboard(null);
+        setIsEdit(false);
+    }
+
     const cancelHandler = () => {
         setCurrentDashboard(null);
         setIsEdit(false);
@@ -118,8 +135,6 @@ const Dashboard = () => {
             </div>
         );
     }
-
-    console.log(dashboardsList.length);
 
     if (dashboardsList.length === 0 && !currentDashboard) {
         return (
@@ -196,7 +211,9 @@ const Dashboard = () => {
             <ToolBar dashboards={dashboardsList} addHandler={addHandler} selectHandler={selectDashboardHandler} />
             {currentDashboard ? (
                 <Row>
-                    <h1>{currentDashboard.name}</h1><Button onClick={editHandler}>Edit</Button>
+                    <h1>{currentDashboard.name}</h1>
+                    <Button onClick={editHandler}>Edit</Button>
+                    <Button onClick={deleteHandler}>Delete</Button>
                     {[1, 2, 3, 4].map(col => (
                         <div key={col} className="col-lg-3 col-md-4 col-sm-6 col-xs-12">
                             {isEdit ? (
