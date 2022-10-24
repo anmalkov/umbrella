@@ -17,9 +17,9 @@ const WidgetEntities = ({ name, entities, states }) => {
         if (!containsLights || !states || states.length === 0) {
             return;
         }
-        setAnyConnected(states.filter(s => s.state && s.state.connected).length > 0);
-        setAnyTurnedOn(states.filter(s => s.state && s.state.turnedOn).length > 0);
-        var maxBrightness = Math.max(...states.filter(s => s.state.connected && s.state.turnedOn).map(s => s.state.brightness)) || 0;
+        setAnyConnected(states.filter(s => s && s.state && s.state.connected).length > 0);
+        setAnyTurnedOn(states.filter(s => s && s.state && s.state.turnedOn).length > 0);
+        var maxBrightness = Math.max(...states.filter(s => s && s.state && s.state.connected && s.state.turnedOn).map(s => s.state.brightness)) || 0;
         setBrightness(maxBrightness);
     }, [states, containsLights]);
 
@@ -39,10 +39,8 @@ const WidgetEntities = ({ name, entities, states }) => {
 
     const handleAllTurnedOnChange = (e) => {
         const turnOn = e.target.checked;
-        //states.filter(s => s.state.connected && s.state.turnedOn === !turnOn).forEach(s => setState(s.id, turnOn, null, null));
-        var props = states.filter(s => s.state.connected && s.state.turnedOn === !turnOn)
+        var props = states.filter(s => s && s.state && s.state.connected && s.state.turnedOn === !turnOn)
             .map(s => ({ id: s.id, turnedOn: turnOn }));
-        console.log(props);
         setLightsStates(props);
     }
 
@@ -58,7 +56,10 @@ const WidgetEntities = ({ name, entities, states }) => {
             setTimer(null);
         }
         setTimer(setTimeout(() => {
-            states.filter(s => s.state.connected && s.state.turnedOn).forEach(s => setState(s.id, null, newBrightness, null));
+            var props = states.filter(s => s && s.state && s.state.connected && s.state.turnedOn)
+                .map(s => ({ id: s.id, brightness: newBrightness }));
+            setLightsStates(props);
+            //states.filter(s => s && s.state && s.state.connected && s.state.turnedOn).forEach(s => setState(s.id, null, newBrightness, null));
         }, 100));
     }    
 
@@ -81,9 +82,10 @@ const WidgetEntities = ({ name, entities, states }) => {
                 </Row>
             }
             {entities.sort((a, b) => a.name > b.name ? 1 : -1).map(e => {
-                const state = states.find(s => s.id === e.id).state;
-                const turnedOn = (state && state.turnedOn) || false;
-                const connected = (state && state.connected) || false;
+                const foundState = states.find(s => s.id === e.id);
+                const state = foundState ? foundState.state : null;
+                const turnedOn = state ? state.turnedOn : false;
+                const connected = state ? state.connected : false;
                 return (
                     <Row key={e.id} className="mb-2">
                         <Col className={`pt-1 ${!connected ? 'disabled' : ''}`}>{e.name}</Col>

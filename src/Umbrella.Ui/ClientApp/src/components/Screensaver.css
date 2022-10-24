@@ -1,19 +1,33 @@
 .screensaver {
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: black;
-  font-size: 32px;
-  color: cornflowerblue;
-  z-index: 1;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: black;
+    font-size: 2em;
+    color: white;
+    z-index: 1;
 }
 
-.screensaver > img {
-    width: 100%;
-    height: auto;
+    .screensaver > * > h1 {
+        text-shadow: 1px 1px 0.2em black;
+    }
+
+    .screensaver > img {
+        width: auto;
+        height: 100%;
+    }
+
+@media only screen and (min-width: 1024px) {
+
+    .screensaver > * > .display-1 {
+        font-size: 4.7em;
+    }
+    .screensaver > * > .display-6 {
+        font-size: 2em;
+    }
 }

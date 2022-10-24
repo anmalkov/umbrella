@@ -1,4 +1,6 @@
 ﻿using MediatR;
+using Microsoft.Extensions.Primitives;
+using Microsoft.Net.Http.Headers;
 using System.Reflection;
 using Umbrella.Core.Repositories;
 using Umbrella.Core.Services;
