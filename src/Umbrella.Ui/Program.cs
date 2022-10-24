@@ -29,12 +29,14 @@ builder.Services.AddSingleton<IRegistrationService, RegistrationService>();
 builder.Services.AddSingleton<IEntitiesService, EntitiesService>();
 builder.Services.AddSingleton<IAreasService, AreasService>();
 builder.Services.AddSingleton<IGroupsService, GroupsService>();
+builder.Services.AddSingleton<IDashboardsService, DashboardsService>();
 
 builder.Services.AddSingleton<IExtensionRepository, ExtensionRepository>();
 builder.Services.AddSingleton<IConfigurationRepository, ConfigurationRepository>();
 builder.Services.AddSingleton<IEntitiesRepository, EntitiesRepository>();
 builder.Services.AddSingleton<IAreasRepository, AreasRepository>();
 builder.Services.AddSingleton<IGroupsRepository, GroupsRepository>();
+builder.Services.AddSingleton<IDashboardsRepository, DashboardsRepository>();
 
 var app = builder.Build();
 
@@ -58,6 +60,10 @@ app.MediatePut<SetEntitiesStatesRequest>("/api/entities/states");
 app.MediateGet<GetAreasRequest>("/api/areas");
 
 app.MediateGet<GetGroupsRequest>("/api/groups");
+
+app.MediateGet<GetDashboardsRequest>("/api/dashboards");
+app.MediatePost<CreateDashboardRequest>("/api/dashboards");
+app.MediatePut<UpdateDashboardRequest>("/api/dashboards/{id}");
 
 app.MediateGet<GetPhotoRequest>("/api/photos");
 

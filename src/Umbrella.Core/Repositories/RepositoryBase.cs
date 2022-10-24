@@ -42,6 +42,19 @@ public abstract class RepositoryBase<T> where T: class, IStorableItem
         await SaveAsync();
     }
 
+    public async Task UpdateAsync(T item)
+    {
+        await LoadAsync();
+
+        if (_items!.ContainsKey(item.Id))
+        {
+            _items.TryRemove(item.Id, out _);
+            _items.TryAdd(item.Id, item);
+        }
+
+        await SaveAsync();
+    }
+
     public async Task DeleteAync(string id)
     {
         await LoadAsync();

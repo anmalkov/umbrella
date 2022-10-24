@@ -21,7 +21,7 @@ const Groups = () => {
     if (groupsList.length === 0) {
         return (
             <div>
-                <p>There are no entities registered yet</p>
+                <p>There are no groups yet</p>
             </div>
         );
     }
