@@ -16,6 +16,9 @@ internal record AreaId(string id, List<Guid> ChildrenHueRid);
 public class HueExtension : IExtension
 {
     private const string BridgeIpParameterName = "bridgeIp";
+    private const string ImportRoomsParameterName = "includeRooms";
+    private const string ImportZonesParameterName = "includeZones";
+
     private const string AppKeyParameterName = "appKey";
     private const string ClientKeyParameterName = "clientKey";
     private const string LightsIdsParameterName = "ids";
@@ -39,6 +42,14 @@ public class HueExtension : IExtension
     <label for=""" + BridgeIpParameterName + @""" class=""form-label"">Hue bridge IP address</label>
     <input type=""text"" class=""form-control"" name=""" + BridgeIpParameterName + @""" aria-describedby=""hubIpAddressHelp"">
     <div id=""hubIpAddressHelp"" class=""form-text"">In the Hue mobile app go to: Settings -> My Hue System -> Philips Hue</div>
+  </div>
+  <div class=""mb-3 form-check form-switch"">
+    <input type=""checkbox"" class=""form-check-input"" role=""switch"" name=""" + ImportRoomsParameterName + @""" aria-describedby=""includeRoomsHelp"">
+    <label for=""" + ImportRoomsParameterName + @""" class=""form-check-label"">Import rooms to areas</label>
+  </div>
+  <div class=""mb-3 form-check form-switch"">
+    <input type=""checkbox"" class=""form-check-input"" role=""switch"" name=""" + ImportZonesParameterName + @""" aria-describedby=""includeRoomsHelp"">
+    <label for=""" + ImportZonesParameterName + @""" class=""form-check-label"">Import zones to groups</label>
   </div>
   <p><b>NOTE:</b> Please make sure that you press the button on your Philips Hue Hub before you press 'Register' button below</p>";
 
@@ -85,18 +96,35 @@ public class HueExtension : IExtension
             throw new ArgumentException($"Parameter '{BridgeIpParameterName}' must have a value");
         }
 
+        var importRooms = false;
+        if (parameters.ContainsKey(ImportRoomsParameterName))
+        {
+            importRooms = bool.Parse(parameters[ImportRoomsParameterName]);
+            parameters.Remove(ImportRoomsParameterName);
+        }
+
+        var importZones = false;
+        if (parameters.ContainsKey(ImportZonesParameterName))
+        {
+            importZones = bool.Parse(parameters[ImportZonesParameterName]);
+            parameters.Remove(ImportZonesParameterName);
+        }
+
         _hueClient = new HueClient(_httpClient, bridgeIp);
         var regInfo = await _hueClient.RegisterAsync(ApplicationName, DeviceName);
 
         parameters.Add(AppKeyParameterName, regInfo?.ApplicationKey);
         parameters.Add(ClientKeyParameterName, regInfo?.ApplicationKey);
 
-        var areaIds = await AddAllAreas();
+        var areaIds = importRooms ? await AddAllAreas() : null;
 
         var lightsIds = await AddAllLights(areaIds);
         parameters.Add(LightsIdsParameterName, JsonSerializer.Serialize(lightsIds));
 
-        await AddAllGroups(lightsIds);
+        if (importZones)
+        {
+            await AddAllGroups(lightsIds);
+        }
     }
 
     private async Task AddAllGroups(IEnumerable<LightId> lightIds)
@@ -135,7 +163,7 @@ public class HueExtension : IExtension
         return areasIds;
     }
 
-    private async Task<List<LightId>> AddAllLights(IEnumerable<AreaId> areaIds)
+    private async Task<List<LightId>> AddAllLights(IEnumerable<AreaId>? areaIds)
     {
         if (_hueClient is null)
         {
@@ -147,7 +175,7 @@ public class HueExtension : IExtension
         var lightsIds = new List<LightId>();
         foreach (var light in lights)
         {
-            var areaId = areaIds.Where(a => a.ChildrenHueRid.Any(d => d == light.Owner.Rid)).Select(a => a.id).FirstOrDefault();
+            var areaId = areaIds?.Where(a => a.ChildrenHueRid.Any(d => d == light.Owner.Rid)).Select(a => a.id).FirstOrDefault();
             var entity = MapLightToEntity(light, lightIndex++, areaId);
             await _registrationService.RegisterEntityAsync(entity, Id);
             lightsIds.Add(new LightId(light.Id, light.Owner.Rid, entity.Id));

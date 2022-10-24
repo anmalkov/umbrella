@@ -5,7 +5,7 @@ import './Screensaver.css';
 
 const Screensaver = ({ hideScreensaver }) => {
 
-    const { isError, isLoading, data, error } = useQuery(['photo'], fetchPhoto, { refetchInterval: 5000 });
+    const { isError, isLoading, data, error } = useQuery(['photo'], fetchPhoto, { refetchInterval: 60000 });
 
     const [currentDate, setCurrentDate] = useState(new Date());
 

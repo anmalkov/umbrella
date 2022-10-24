@@ -20,6 +20,6 @@ public class GetEntitiesStatesHandler : IRequestHandler<GetEntitiesStatesRequest
     public Task<IResult> Handle(GetEntitiesStatesRequest request, CancellationToken cancellationToken)
     {
         var states = _entitiesService.GetStates()?.Select(e => new EntityStateDto(e.Key, e.Value));
-        return Task.FromResult(Results.Ok(states));
+        return Task.FromResult(Results.Ok(states ?? Array.Empty<EntityStateDto>()));
     }
 }

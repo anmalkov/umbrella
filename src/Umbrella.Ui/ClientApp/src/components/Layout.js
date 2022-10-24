@@ -18,7 +18,7 @@ const Layout = (props) => {
 
     const startTimeout = () => {
         clearTimeout(screensaverTimeout);
-        const timeout = setTimeout(showScreensaver, 2000);
+        const timeout = setTimeout(showScreensaver, 60000);
         setScreensaverTimeout(timeout);
     }
 

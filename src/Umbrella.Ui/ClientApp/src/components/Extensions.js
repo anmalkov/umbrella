@@ -43,7 +43,8 @@ const Extensions = () => {
         try {
             const inputs = Array.from(registrationParamsRef.current.getElementsByTagName('input'));
             const data = [];
-            inputs.forEach(e => data.push({ key: e.id ? e.id : e.name, value: e.value }));
+            inputs.forEach(e => data.push({ key: e.id ? e.id : e.name, value: e.type === 'checkbox' ? String(e.checked) : e.value }));
+            console.log(data);
             await registerMutation.mutateAsync({ id: selectedExtension.id, parameters: data });
             queryClient.invalidateQueries(['extensions']);
             queryClient.invalidateQueries(['entities']);
