@@ -94,7 +94,7 @@ const EditWidget = ({ oldWidget, saveHandler, cancelHandler }) => {
                         <Input type="select" value={widget.targetIds[0]} disabled={!areasList} onChange={targetIdChangeHandler}>
                             {areasList && areasList.length > 0
                                 ? areasList.map(a => (
-                                    <option key={a.id} value={a.id}>{a.name}]</option>
+                                    <option key={a.id} value={a.id}>{a.name}</option>
                                 ))
                                 : (
                                     <option>There are no areas yet</option>
@@ -110,7 +110,7 @@ const EditWidget = ({ oldWidget, saveHandler, cancelHandler }) => {
                             <Input type="select" value={widget.targetIds[0]} disabled={!groupsList} onChange={targetIdChangeHandler}>
                                 {groupsList && groupsList.length > 0
                                     ? groupsList.map(g => (
-                                        <option key={g.id} value={g.id}>{g.name}]</option>
+                                        <option key={g.id} value={g.id}>{g.name}</option>
                                     ))
                                     : (
                                         <option>There are no groups yet</option>

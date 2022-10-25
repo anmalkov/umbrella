@@ -133,12 +133,9 @@ const Dashboard = () => {
 
     return (
         <div>
-            <ToolBar dashboards={dashboardsList} addHandler={addHandler} selectHandler={selectDashboardHandler} />
+            <ToolBar dashboards={dashboardsList} currentDashboard={currentDashboard} addHandler={addHandler} selectHandler={selectDashboardHandler} editHandler={editHandler} deleteHandler={deleteHandler} />
             {currentDashboard ? (
                 <Row>
-                    <h1>{currentDashboard.name}</h1>
-                    <Button onClick={editHandler}>Edit</Button>
-                    <Button onClick={deleteHandler}>Delete</Button>
                     {[1, 2, 3, 4].map(col => (
                         <div key={col} className="col-lg-3 col-md-4 col-sm-6 col-xs-12">
                             {isEdit ? (

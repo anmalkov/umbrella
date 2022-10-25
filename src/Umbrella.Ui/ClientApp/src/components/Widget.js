@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardBody, CardText, Spinner, Alert } from 'reactstrap';
+import { Card, CardBody, CardText, CardFooter, Spinner, Alert, Button } from 'reactstrap';
 import { useQuery } from 'react-query';
 import { fetchEntities } from '../fetchers/entities';
 import { fetchGroups } from '../fetchers/groups';
@@ -8,7 +8,7 @@ import { fetchStates } from '../fetchers/states';
 import WidgetLight from './WidgetLight';
 import WidgetEntities from './WidgetEntities';
 
-const Widget = ({ widget }) => {
+const Widget = ({ widget, isEdit, deleteHandler, editHandler }) => {
 
     const entitiesQuery = useQuery(['entities'], fetchEntities, { staleTime: 60000 });
     const entitiesList = entitiesQuery.data;
@@ -114,6 +114,12 @@ const Widget = ({ widget }) => {
     return (
         <Card className="widget">
             {getWidget()}
+            {isEdit ? (
+                <CardFooter>
+                    <Button onClick={() => editHandler(widget)}>Edit</Button>
+                    <Button color="danger" onClick={() => deleteHandler(widget.id)}>Delete</Button>
+                </CardFooter>
+            ): null}
         </Card>
     );
 }

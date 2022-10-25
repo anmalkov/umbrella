@@ -1,7 +1,7 @@
 import React from 'react';
-import { Row, Col, Button } from 'reactstrap';
+import { Row, Col, Button, List, ListInlineItem } from 'reactstrap';
 
-const ToolBar = ({ dashboards, addHandler, selectHandler }) => {
+const ToolBar = ({ dashboards, currentDashboard, addHandler, selectHandler, editHandler, deleteHandler }) => {
 
     return (
         <Row>
@@ -9,12 +9,29 @@ const ToolBar = ({ dashboards, addHandler, selectHandler }) => {
                 <Col>No dashboards yet</Col>
             ) : (
                 <Col>
-                    {dashboards.map(d => (
-                        <Button key={d.id} onClick={() => selectHandler(d.id)}>{d.name}</Button>
-                    ))}
+                    <List type="inline">
+                        {dashboards.map(d => (
+                            <ListInlineItem>
+                                <Button key={d.id} onClick={() => selectHandler(d.id)} color={currentDashboard && d.id === currentDashboard.id ? 'info' : 'secondary'}>{d.name}</Button>
+                            </ListInlineItem>
+                        ))}
+                    </List>
                 </Col>
             )}
-            <Col><Button className="float-end" onClick={addHandler}>+</Button></Col>
+            <Col>
+                <List type="inline float-end">
+                    <ListInlineItem>
+                        <Button className="" onClick={addHandler}>+</Button>
+                    </ListInlineItem>
+                    {currentDashboard ? (
+                        <ListInlineItem>
+                            <Button className="" onClick={editHandler}>Edit</Button>
+                            {' '}
+                            <Button className="" onClick={deleteHandler}>Delete</Button> 
+                        </ListInlineItem>
+                    ) : null}
+                </List>
+            </Col>
         </Row>
     );
 }

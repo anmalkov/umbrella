@@ -31,6 +31,10 @@ public class UpdateDashboardHandler : IRequestHandler<UpdateDashboardRequest, IR
 
     private Dashboard MapRequestToDashboard(UpdateDashboardRequest request)
     {
-        return new Dashboard(request.Id, request.Body.Name);
+        return new Dashboard(request.Id, request.Body.Name)
+        {
+            Widgets = request.Body.Widgets.ToList()
+        };
+
     }
 }

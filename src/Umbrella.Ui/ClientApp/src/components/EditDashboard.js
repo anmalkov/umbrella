@@ -14,8 +14,27 @@ const EditDashboard = ({ oldDashboard, saveHandler, cancelHandler }) => {
         setCurrentWidget(GetNewWidget());
     }
 
+    const editWidgetHandler = widget => {
+        setCurrentWidget(widget);
+    }
+    
+    const deleteWidgetHandler = id => {
+        console.log(id);
+        if (!window.confirm('Do you want to delete widget?')) {
+            return;
+        }
+        setDashboard({ ...dashboard, widgets: dashboard.widgets.filter(w => w.id !== id) });
+    }
+
     const saveWidgetHandler = (widget) => {
         if (widget.id === 0) {
+            console.log(widget.id);
+            if (dashboard.widgets.length > 0) {
+                widget.id = Math.max(...dashboard.widgets.map(w => w.id)) + 1;
+            } else {
+                widget.id = 1;
+            }
+            console.log(widget.id);
             setDashboard(old => {
                 return { ...old, widgets: [...old.widgets, widget] }
             });
@@ -59,7 +78,7 @@ const EditDashboard = ({ oldDashboard, saveHandler, cancelHandler }) => {
                 {[1, 2, 3, 4].map(col => (
                     <Col key={col} className="col-lg-3 col-md-4 col-sm-6 col-xs-12">
                         {dashboard.widgets.filter(w => w.column === col).sort((a, b) => a.positionInColumn > b.positionInColumn ? 1 : -1).map(w => (
-                            <Widget key={w.id} widget={w} />
+                            <Widget key={w.id} widget={w} isEdit={true} editHandler={editWidgetHandler} deleteHandler={deleteWidgetHandler} />
                         ))}
                     </Col>
                 ))}
