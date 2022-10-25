@@ -8,7 +8,7 @@ import { fetchStates } from '../fetchers/states';
 import WidgetLight from './WidgetLight';
 import WidgetEntities from './WidgetEntities';
 
-const Widget = ({ target }) => {
+const Widget = ({ widget }) => {
 
     const entitiesQuery = useQuery(['entities'], fetchEntities, { staleTime: 60000 });
     const entitiesList = entitiesQuery.data;
@@ -30,17 +30,17 @@ const Widget = ({ target }) => {
         if (isLoading) {
             return;
         }
-        switch (target.type) {
+        switch (widget.type) {
             default:
             case 'entity':
                 if (!entitiesList || !statesList) {
                     return;
                 }
-                const entity = entitiesList.find(e => e.id === target.id);
+                const entity = entitiesList.find(e => e.id === widget.targetIds[0]);
                 if (!entity) {
                     return (
                         <CardBody>
-                            <CardText>Entity {target.id} not found</CardText>
+                            <CardText>Entity {widget.targetIds[0]} not found</CardText>
                         </CardBody>
                     );
                 }
@@ -54,11 +54,11 @@ const Widget = ({ target }) => {
                 if (!groupsList || !entitiesList || !statesList) {
                     return;
                 }
-                const group = groupsList.find(e => e.id === target.id);
+                const group = groupsList.find(e => e.id === widget.id);
                 if (!group) {
                     return (
                         <CardBody>
-                            <CardText>Group {target.id} not found</CardText>
+                            <CardText>Group {widget.targetIds[0]} not found</CardText>
                         </CardBody>
                     );
                 }
@@ -69,11 +69,11 @@ const Widget = ({ target }) => {
                 if (!areasList || !entitiesList || !statesList) {
                     return;
                 }
-                const area = areasList.find(e => e.id === target.id);
+                const area = areasList.find(e => e.id === widget.targetIds[0]);
                 if (!area) {
                     return (
                         <CardBody>
-                            <CardText>Area {target.id} not found</CardText>
+                            <CardText>Area {widget.targetIds[0]} not found</CardText>
                         </CardBody>
                     );
                 }

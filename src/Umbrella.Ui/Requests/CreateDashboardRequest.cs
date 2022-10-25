@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Collections;
+using Umbrella.Core.Models;
 
 namespace Umbrella.Ui.Requests;
 
 public record struct CreateDashboardRequestBody(
     string Name,
-    IEnumerable<string> Widgets
+    IEnumerable<Widget> Widgets
 );
 
 public record struct CreateDashboardRequest(

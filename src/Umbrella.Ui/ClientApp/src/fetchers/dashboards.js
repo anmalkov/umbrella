@@ -5,11 +5,11 @@ export const fetchDashboards = async () => {
     return dashboards;
 }
 
-export const createDashboard = async (name, widgets) => {
+export const createDashboard = async (dashboard) => {
     const request = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name, widgets: widgets })
+        body: JSON.stringify({ name: dashboard.name, widgets: dashboard.widgets })
     };
     const response = await fetch('api/dashboards', request);
     if (response.status !== 200) {
@@ -18,13 +18,13 @@ export const createDashboard = async (name, widgets) => {
     }
 }
 
-export const updateDashboard = async (id, name, widgets) => {
+export const updateDashboard = async (dashboard) => {
     const request = {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: id, name: name, widgets: widgets })
+        body: JSON.stringify({ id: dashboard.id, name: dashboard.name, widgets: dashboard.widgets })
     };
-    const response = await fetch(`api/dashboards/${id}`, request);
+    const response = await fetch(`api/dashboards/${dashboard.id}`, request);
     if (response.status !== 200) {
         const result = await response.json();
         throw Error(result.detail);

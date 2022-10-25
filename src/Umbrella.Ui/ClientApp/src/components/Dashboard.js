@@ -5,6 +5,7 @@ import { useQueryClient, useQuery, useMutation } from 'react-query';
 import { fetchDashboards, createDashboard, updateDashboard, deleteDashboard } from '../fetchers/dashboards';
 import ToolBar from './ToolBar';
 import Widget from './Widget';
+import EditDashboard, { GetNewDashboard } from './EditDashboard';
 
 const Dashboard = () => {
 
@@ -12,20 +13,17 @@ const Dashboard = () => {
     const dashboardsList = data
 
     const [currentDashboard, setCurrentDashboard] = useState(null);
-    const [connection, setConnection] = useState(null);
     const [isEdit, setIsEdit] = useState(false);
-    const [name, setName] = useState('New dashboard');
-    const [currentWidget, setCurrentWidget] = useState(null);
-    const [isEditWidget, setIsEditWidget] = useState(false);
+    const [connection, setConnection] = useState(null);
 
     const queryClient = useQueryClient();
 
-    const createMutation = useMutation(({ name, widgets }) => {
-        return createDashboard(name, widgets);
+    const createMutation = useMutation(dashboard => {
+        return createDashboard(dashboard);
     });
 
-    const updateMutation = useMutation(({ id, name, widgets }) => {
-        return updateDashboard(id, name, widgets);
+    const updateMutation = useMutation(dashboard => {
+        return updateDashboard(dashboard);
     });
 
     const deleteMutation = useMutation((id) => {
@@ -61,26 +59,22 @@ const Dashboard = () => {
     }, [connection]);        
 
     const addHandler = () => {
-        setName('New dashboard');
-        setCurrentDashboard({ id: null, name: name, widgets: [] });
+        setCurrentDashboard(GetNewDashboard());
         setIsEdit(true);
-        setCurrentWidget(null);
-        setIsEditWidget(false);
     }
 
     const editHandler = () => {
-        setName(currentDashboard.name);
-        setIsEdit(true);
-        setCurrentWidget(null);
-        setIsEditWidget(false);
+        if (currentDashboard) {
+            setIsEdit(true);
+        }
     }
 
-    const saveHandler = async () => {
+    const saveHandler = async (dashboard) => {
         try {
-            if (!currentDashboard.id) {
-                await createMutation.mutateAsync({ name: name, widgets: [] });
+            if (!dashboard.id) {
+                await createMutation.mutateAsync(dashboard);
             } else {
-                await updateMutation.mutateAsync({ id: currentDashboard.id, name: name, widgets: [] });
+                await updateMutation.mutateAsync(dashboard);
             }
             queryClient.invalidateQueries(['dashboards']);
             queryClient.refetchQueries('dashboards', { force: true });
@@ -91,7 +85,7 @@ const Dashboard = () => {
     }
 
     const deleteHandler = async () => {
-        if (!window.confirm(`Do you want to delete dashboard '${currentDashboard.name}' ?`)) {
+        if (!currentDashboard || !window.confirm(`Do you want to delete dashboard '${currentDashboard.name}' ?`)) {
             return;
         }
         try {
@@ -101,22 +95,11 @@ const Dashboard = () => {
         }
         catch { }
         setCurrentDashboard(null);
-        setIsEdit(false);
     }
 
     const cancelHandler = () => {
         setCurrentDashboard(null);
         setIsEdit(false);
-    }
-
-    const addWidgetHandler = () => {
-        setCurrentWidget({});
-        setIsEditWidget(true);
-    }
-
-    const cancelWidgetHandler = () => {
-        setCurrentWidget(null);
-        setIsEditWidget(false);
     }
 
     const selectDashboardHandler = id => {
@@ -136,7 +119,7 @@ const Dashboard = () => {
         );
     }
 
-    if (dashboardsList.length === 0 && !currentDashboard) {
+    if ((!dashboardsList || dashboardsList.length === 0) && !currentDashboard) {
         return (
             <ToolBar name="No dashboards yet" addHandler={addHandler} />
         )
@@ -144,65 +127,7 @@ const Dashboard = () => {
 
     if (currentDashboard && isEdit) {
         return (
-            <div>
-                <Row>
-                    <Col>
-                        <Button onClick={saveHandler}>Save</Button>
-                        <Button onClick={cancelHandler}>Cancel</Button>
-                    </Col>
-                </Row>
-                <Row>
-                    <Input type="text" value={name} onChange={e => setName(e.target.value)} />
-                </Row>
-                {currentWidget && isEditWidget ? (
-                    <Form>
-                        <FormGroup>
-                            <Col>
-                                <Button onClick={addWidgetHandler}>Save</Button>
-                                <Button onClick={cancelWidgetHandler}>Cancel</Button>
-                            </Col>
-                        </FormGroup>
-                        <FormGroup>
-                            <Label for="exampleEmail">Column</Label>
-                            <Input type="select" value="1">
-                                <option>1</option>
-                                <option>2</option>
-                                <option>3</option>
-                                <option>4</option>
-                            </Input>
-                        </FormGroup>
-                        <FormGroup>
-                            <Label for="exampleEmail">Position in column</Label>
-                            <Input type="text" value="1" />
-                        </FormGroup>
-                        <FormGroup>
-                            <Label for="exampleEmail">Type</Label>
-                            <Input type="select">
-                                <option>Entity</option>
-                                <option>Area</option>
-                                <option>Group</option>
-                            </Input>
-                        </FormGroup>
-                        <FormGroup>
-                            <Label for="exampleEmail">Parameters</Label>
-                            <Input type="text" value="Parameters" />
-                        </FormGroup>
-                    </Form>
-                ) : (
-                    <Row>
-                        <Button onClick={addWidgetHandler}>Add widget</Button>
-                    </Row >
-                )}
-                <Row>
-                    {[1, 2, 3, 4].map(col => (
-                        <Col key={col} className="col-lg-3 col-md-4 col-sm-6 col-xs-12">
-                            {currentDashboard.widgets.filter(w => w.column === col).sort((a, b) => a.positionInColumn > b.positionInColumn ? 1 : -1).map(w => (
-                                <Widget key={w.id} target={w.target} />
-                            ))}
-                        </Col>
-                    ))}
-                </Row>
-            </div>
+            <EditDashboard oldDashboard={currentDashboard} saveHandler={saveHandler} cancelHandler={cancelHandler} />
         );
     }
 
@@ -220,7 +145,7 @@ const Dashboard = () => {
                                 <Button>+</Button>
                             ) : null}
                             {currentDashboard.widgets.filter(w => w.column === col).sort((a, b) => a.positionInColumn > b.positionInColumn ? 1 : -1).map(w => (
-                                <Widget key={w.id} target={w.target} />
+                                <Widget key={w.id} widget={w} />
                             ))}
                         </div>
                     ))}

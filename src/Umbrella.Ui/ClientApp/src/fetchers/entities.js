@@ -18,7 +18,6 @@ export const setLightsStates = async (states) => {
             colorTemperature: s.colorTemperature != null ? Number(s.colorTemperature) : null
         }
     }));
-    console.log(params);
     await updateEntitiesStates(params);
 }
 

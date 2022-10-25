@@ -13,14 +13,14 @@ public class Widget
     public byte Column { get; set; }
     public byte PositionInColumn { get; set; }
     public string Type { get; set; }
-    public IEnumerable<KeyValuePair<string, string>> Parameters { get; set; }
+    public IEnumerable<string> TargetIds { get; set; }
 
-    public Widget(int id, byte column, byte positionInColumn, string type, IEnumerable<KeyValuePair<string, string>> parameters)
+    public Widget(int id, byte column, byte positionInColumn, string type, IEnumerable<string> targetIds)
     {
         Id = id;
         Column = column;
         PositionInColumn = positionInColumn;
         Type = type;
-        Parameters = parameters;
+        TargetIds = targetIds;
     }
 }

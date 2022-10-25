@@ -32,6 +32,9 @@ public class CreateDashboardHandler : IRequestHandler<CreateDashboardRequest, IR
     private Dashboard MapRequestToDashboard(CreateDashboardRequestBody request)
     {
         var id = $"dashboard.{request.Name.ToLower().Replace(' ', '_')}";
-        return new Dashboard(id, request.Name);
+        return new Dashboard(id, request.Name)
+        {
+            Widgets = request.Widgets.ToList()
+        };
     }
 }
