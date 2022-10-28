@@ -30,9 +30,9 @@ const Layout = (props) => {
 
     return (
         <div onClick={appTouched}>
-            {screensaverShown &&
+            {screensaverShown ? (
                 <Screensaver hideScreensaver={hideScreensaver} />
-            }
+            ) : null}
             <NavMenu />
             <Container tag="main" fluid>
                 {props.children}

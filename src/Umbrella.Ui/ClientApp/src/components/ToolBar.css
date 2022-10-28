@@ -1,0 +1,18 @@
+﻿.mt-m3 {
+    margin-top: -1em;
+}
+
+.toolbar, .toolbar-minimal {
+    background-color: #191919;
+    margin-right: calc(-0.5 * var(--bs-gutter-x));
+    margin-left: calc(-0.5 * var(--bs-gutter-x));
+}
+
+.toolbar-minimal {
+    height: 1em;
+}
+
+.toolbar a {
+    color: white;
+    text-decoration: none;
+}

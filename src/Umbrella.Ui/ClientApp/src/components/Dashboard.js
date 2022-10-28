@@ -56,7 +56,13 @@ const Dashboard = () => {
             }
         }
         connect();
-    }, [connection]);        
+    }, [connection]);    
+
+    useEffect(() => {
+        if (!currentDashboard && data && data.length > 0) {
+            setCurrentDashboard(data[0])
+        }
+    }, [data])
 
     const addHandler = () => {
         setCurrentDashboard(GetNewDashboard());

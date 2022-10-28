@@ -20,3 +20,7 @@ html {
 .bg-dark {
     background-color: var(--super-dark) !important;
 }
+
+.navbar-minimal {
+    height: 1em;
+}
