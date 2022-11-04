@@ -7,6 +7,7 @@ import { fetchAreas } from '../fetchers/areas';
 import { fetchStates } from '../fetchers/states';
 import WidgetLight from './WidgetLight';
 import WidgetEntities from './WidgetEntities';
+import WidgetWeather from './WidgetWeather';
 
 const Widget = ({ widget, isEdit, deleteHandler, editHandler }) => {
 
@@ -48,7 +49,7 @@ const Widget = ({ widget, isEdit, deleteHandler, editHandler }) => {
                 switch (entity.type) {
                     default:
                     case 'light':
-                        return (<WidgetLight entity={entity} state={state} />);
+                        return <WidgetLight entity={entity} state={state} />;
                 }
             case 'group':
                 if (!groupsList || !entitiesList || !statesList) {
@@ -64,7 +65,7 @@ const Widget = ({ widget, isEdit, deleteHandler, editHandler }) => {
                 }
                 const groupEntities = group.entities.map(id => entitiesList.find(e => e.id === id));
                 const groupStates = group.entities.map(id => (statesList && statesList.find(s => s.id === id)) || {});
-                return (<WidgetEntities name={group.name} entities={groupEntities} states={groupStates} />);
+                return <WidgetEntities name={group.name} entities={groupEntities} states={groupStates} />;
             case 'area':
                 if (!areasList || !entitiesList || !statesList) {
                     return;
@@ -79,7 +80,9 @@ const Widget = ({ widget, isEdit, deleteHandler, editHandler }) => {
                 }
                 const areaEntities = entitiesList.filter(e => e.areaId === area.id);
                 const areaStates = areaEntities.map(e => (statesList && statesList.find(s => s.id === e.id)) || {});
-                return (<WidgetEntities name={area.name} entities={areaEntities} states={areaStates} />);
+                return <WidgetEntities name={area.name} entities={areaEntities} states={areaStates} />;
+            case 'weather':
+                return <WidgetWeather />;
         }
     }
 

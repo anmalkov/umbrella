@@ -9,6 +9,13 @@ const GetNewWidget = () => { return { id: 0, name: '', column: 1, positionInColu
 
 const EditWidget = ({ oldWidget, saveHandler, cancelHandler }) => {
 
+    const widgetTypes = [
+        { id: 'entity', title: 'Entity' },
+        { id: 'area', title: 'Area' },
+        { id: 'group', title: 'Group' },
+        { id: 'weather', title: 'Weather' }
+    ];
+
     const [widget, setWidget] = useState({ ...oldWidget });
 
     const entitiesQuery = useQuery(['entities'], fetchEntities, { staleTime: 60000 });
@@ -66,9 +73,9 @@ const EditWidget = ({ oldWidget, saveHandler, cancelHandler }) => {
             <FormGroup>
                 <Label for="exampleEmail">Type</Label>
                 <Input type="select" value={widget.type} onChange={typeChangeHandler}>
-                    <option value="entity">Entity</option>
-                    <option value="area">Area</option>
-                    <option value="group">Group</option>
+                    {widgetTypes.map(w => (
+                        <option key={w.id} value={w.id}>{w.title}</option>
+                    ))}
                 </Input>
             </FormGroup>
             {widget.type === 'entity' ?
@@ -104,21 +111,28 @@ const EditWidget = ({ oldWidget, saveHandler, cancelHandler }) => {
                     </FormGroup>
                 )
                 : widget.type === 'group' ?
-                    (
-                        <FormGroup>
-                            <Label for="exampleEmail">Select group</Label>
-                            <Input type="select" value={widget.targetIds[0]} disabled={!groupsList} onChange={targetIdChangeHandler}>
-                                {groupsList && groupsList.length > 0
-                                    ? groupsList.map(g => (
-                                        <option key={g.id} value={g.id}>{g.name}</option>
-                                    ))
-                                    : (
-                                        <option>There are no groups yet</option>
-                                    )
-                                }
-                            </Input>
-                        </FormGroup>
-                    ) : null
+                (
+                    <FormGroup>
+                        <Label for="exampleEmail">Select group</Label>
+                        <Input type="select" value={widget.targetIds[0]} disabled={!groupsList} onChange={targetIdChangeHandler}>
+                            {groupsList && groupsList.length > 0
+                                ? groupsList.map(g => (
+                                    <option key={g.id} value={g.id}>{g.name}</option>
+                                ))
+                                : (
+                                    <option>There are no groups yet</option>
+                                )
+                            }
+                        </Input>
+                    </FormGroup>
+                )
+                : widget.type === 'weather' ?
+                (
+                    <FormGroup>
+                        <Label for="exampleEmail">City</Label>
+                        <Input type="text" value={widget.targetIds[0]} onChange={targetIdChangeHandler} />
+                    </FormGroup>
+                ) : null
             }
         </Form>
     );

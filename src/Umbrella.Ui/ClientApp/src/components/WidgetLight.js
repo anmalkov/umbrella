@@ -53,7 +53,7 @@ const WidgetLight = ({ entity, state }) => {
 
     return (
         <CardBody>
-            {error && <UncontrolledAlert color="danger">{error.message}</UncontrolledAlert>}
+            {error ? <UncontrolledAlert color="danger">{error.message}</UncontrolledAlert> : null}
             <CardTitle>
                 <Row>
                     <Col><h4 className={!connected ? 'disabled' : ''}>{entity.name}</h4></Col>
