@@ -14,7 +14,7 @@ public class GetDashboardsHandler : IRequestHandler<GetDashboardsRequest, IResul
         byte Column,
         byte PositionInColumn,
         string Type,
-        IEnumerable<string> TargetIds);
+        IEnumerable<KeyValuePair<string, string?>>? Parameters);
     
     public record DashboardDto(
         string Id,
@@ -40,7 +40,7 @@ public class GetDashboardsHandler : IRequestHandler<GetDashboardsRequest, IResul
                 w.Column,
                 w.PositionInColumn,
                 w.Type,
-                w.TargetIds
+                w.Parameters
             ))
         ));
         return Results.Ok(dashboards);

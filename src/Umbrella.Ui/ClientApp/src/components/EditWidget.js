@@ -5,7 +5,7 @@ import { fetchEntities } from '../fetchers/entities';
 import { fetchAreas } from '../fetchers/areas';
 import { fetchGroups } from '../fetchers/groups';
 
-const GetNewWidget = () => { return { id: 0, name: '', column: 1, positionInColumn: 10, type: 'entity', targetIds: [''] } };
+const GetNewWidget = () => { return { id: 0, name: '', column: 1, positionInColumn: 10, type: 'entity', parameters: [] } };
 
 const EditWidget = ({ oldWidget, saveHandler, cancelHandler }) => {
 
@@ -44,9 +44,21 @@ const EditWidget = ({ oldWidget, saveHandler, cancelHandler }) => {
     }
 
     const targetIdChangeHandler = (e) => {
+        const parameters = [];
+        switch (widget.type) {
+            case 'weather':
+                parameters.push({ key: 'city', value: e.target.value });
+            default:
+                parameters.push({ key: 'id', value: e.target.value });
+        }
         setWidget(old => {
-            return { ...old, targetIds: [e.target.value] };
+            return { ...old, parameters: parameters };
         });
+    }
+
+    const getParameter = name => {
+        const parameter = widget.parameters.find(p => p.key === name);
+        return parameter ? parameter.value : '';
     }
 
     return (
@@ -82,7 +94,7 @@ const EditWidget = ({ oldWidget, saveHandler, cancelHandler }) => {
                 (
                     <FormGroup>
                         <Label for="exampleEmail">Select entity</Label>
-                        <Input type="select" value={widget.targetIds[0]} disabled={!entitiesList} onChange={targetIdChangeHandler}>
+                        <Input type="select" value={getParameter('id')} disabled={!entitiesList} onChange={targetIdChangeHandler}>
                             {entitiesList && entitiesList.length > 0
                                 ? entitiesList.map(e => (
                                     <option key={e.id} value={e.id}>{e.name} [{e.type}]</option>
@@ -98,7 +110,7 @@ const EditWidget = ({ oldWidget, saveHandler, cancelHandler }) => {
                 (
                     <FormGroup>
                         <Label for="exampleEmail">Select area</Label>
-                        <Input type="select" value={widget.targetIds[0]} disabled={!areasList} onChange={targetIdChangeHandler}>
+                        <Input type="select" value={getParameter('id')} disabled={!areasList} onChange={targetIdChangeHandler}>
                             {areasList && areasList.length > 0
                                 ? areasList.map(a => (
                                     <option key={a.id} value={a.id}>{a.name}</option>
@@ -114,7 +126,7 @@ const EditWidget = ({ oldWidget, saveHandler, cancelHandler }) => {
                 (
                     <FormGroup>
                         <Label for="exampleEmail">Select group</Label>
-                        <Input type="select" value={widget.targetIds[0]} disabled={!groupsList} onChange={targetIdChangeHandler}>
+                        <Input type="select" value={getParameter('id')} disabled={!groupsList} onChange={targetIdChangeHandler}>
                             {groupsList && groupsList.length > 0
                                 ? groupsList.map(g => (
                                     <option key={g.id} value={g.id}>{g.name}</option>
@@ -130,7 +142,7 @@ const EditWidget = ({ oldWidget, saveHandler, cancelHandler }) => {
                 (
                     <FormGroup>
                         <Label for="exampleEmail">City</Label>
-                        <Input type="text" value={widget.targetIds[0]} onChange={targetIdChangeHandler} />
+                        <Input type="text" value={getParameter('city')} onChange={targetIdChangeHandler} />
                     </FormGroup>
                 ) : null
             }

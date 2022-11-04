@@ -37,11 +37,12 @@ const Widget = ({ widget, isEdit, deleteHandler, editHandler }) => {
                 if (!entitiesList || !statesList) {
                     return;
                 }
-                const entity = entitiesList.find(e => e.id === widget.targetIds[0]);
+                const entityId = widget.parameters.find(p => p.key = 'id').value;
+                const entity = entitiesList.find(e => e.id === entityId);
                 if (!entity) {
                     return (
                         <CardBody>
-                            <CardText>Entity {widget.targetIds[0]} not found</CardText>
+                            <CardText>Entity {entityId} not found</CardText>
                         </CardBody>
                     );
                 }
@@ -55,11 +56,12 @@ const Widget = ({ widget, isEdit, deleteHandler, editHandler }) => {
                 if (!groupsList || !entitiesList || !statesList) {
                     return;
                 }
-                const group = groupsList.find(e => e.id === widget.id);
+                const groupId = widget.parameters.find(p => p.key = 'id').value;
+                const group = groupsList.find(e => e.id === groupId);
                 if (!group) {
                     return (
                         <CardBody>
-                            <CardText>Group {widget.targetIds[0]} not found</CardText>
+                            <CardText>Group {groupId} not found</CardText>
                         </CardBody>
                     );
                 }
@@ -70,11 +72,12 @@ const Widget = ({ widget, isEdit, deleteHandler, editHandler }) => {
                 if (!areasList || !entitiesList || !statesList) {
                     return;
                 }
-                const area = areasList.find(e => e.id === widget.targetIds[0]);
+                const areaId = widget.parameters.find(p => p.key = 'id').value;
+                const area = areasList.find(e => e.id === areaId);
                 if (!area) {
                     return (
                         <CardBody>
-                            <CardText>Area {widget.targetIds[0]} not found</CardText>
+                            <CardText>Area {areaId} not found</CardText>
                         </CardBody>
                     );
                 }

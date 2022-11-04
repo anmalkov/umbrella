@@ -19,7 +19,6 @@ const EditDashboard = ({ oldDashboard, saveHandler, cancelHandler }) => {
     }
     
     const deleteWidgetHandler = id => {
-        console.log(id);
         if (!window.confirm('Do you want to delete widget?')) {
             return;
         }
@@ -28,13 +27,11 @@ const EditDashboard = ({ oldDashboard, saveHandler, cancelHandler }) => {
 
     const saveWidgetHandler = (widget) => {
         if (widget.id === 0) {
-            console.log(widget.id);
             if (dashboard.widgets.length > 0) {
                 widget.id = Math.max(...dashboard.widgets.map(w => w.id)) + 1;
             } else {
                 widget.id = 1;
             }
-            console.log(widget.id);
             setDashboard(old => {
                 return { ...old, widgets: [...old.widgets, widget] }
             });
