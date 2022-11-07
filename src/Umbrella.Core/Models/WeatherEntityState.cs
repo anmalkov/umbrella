@@ -98,7 +98,7 @@ public sealed class WeatherEntityState : IEntityState
                 )).ToList(),
         };
     }
-
+    
     public void UpdateProperties(IEntityState state)
     {
         if (state.Connected.HasValue)
@@ -109,5 +109,48 @@ public sealed class WeatherEntityState : IEntityState
         {
             return;
         }
+        if (UpdatedAt == weatherState.UpdatedAt)
+        {
+            return;
+        }
+        Connected = weatherState.Connected;
+        UpdatedAt = weatherState.UpdatedAt;
+        Condition = weatherState.Condition;
+        Temperature = weatherState.Temperature;
+        TemperatureFeelsLike = weatherState.TemperatureFeelsLike;
+        TemperatureUnit = weatherState.TemperatureUnit;
+        Pressure = weatherState.Pressure;
+        PressureUnit = weatherState.PressureUnit;
+        Precipitation = weatherState.Precipitation;
+        PrecipitationUnit = weatherState.PrecipitationUnit;
+        PrecipitationProbability = weatherState.PrecipitationProbability;
+        Humidity = weatherState.Humidity;
+        WindSpeed = weatherState.WindSpeed;
+        WindSpeedUnit = weatherState.WindSpeedUnit;
+        WindDegree = weatherState.WindDegree;
+        DailyForecast = weatherState.DailyForecast?.Select(f => new WeatherDailyForecast(
+                f.Date,
+                f.Condition,
+                f.TemperatureDay,
+                f.TemperatureNight,
+                f.Pressure,
+                f.Precipitation,
+                f.PrecipitationProbability,
+                f.Humidity,
+                f.WindSpeed,
+                f.WindDegree
+            )).ToList();
+        HourlyForecast = weatherState.HourlyForecast?.Select(f => new WeatherHourlyForecast(
+                f.DateTime,
+                f.Condition,
+                f.Temperature,
+                f.TemperatureFeelsLike,
+                f.Pressure,
+                f.Precipitation,
+                f.PrecipitationProbability,
+                f.Humidity,
+                f.WindSpeed,
+                f.WindDegree
+            )).ToList();
     }
 }
