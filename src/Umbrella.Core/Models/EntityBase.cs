@@ -2,7 +2,8 @@
 
 public enum EntityType
 {
-    Light = 1
+    Light = 1,
+    Weather = 2
 }
 
 public class EntityBase : IEntity
