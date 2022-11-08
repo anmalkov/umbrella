@@ -6,7 +6,7 @@ using System.Net.Http;
 
 namespace PhilipsHue.Sdk.Tests;
 
-public class HueClientTest
+public class HueClientTests
 {
     [Fact]
     public async Task Register_throws_PhilipsHueLinkButtonNotPressedException_if_button_is_not_pressed()
