@@ -137,6 +137,13 @@ public sealed class EntitiesRepository : IEntitiesRepository
                         _entities.TryAdd(lightEntity.Id, lightEntity);
                     }
                     break;
+                case EntityType.Weather:
+                    var weatherEntity = JsonSerializer.Deserialize<WeatherEntity>(entityJson);
+                    if (weatherEntity != null)
+                    {
+                        _entities.TryAdd(weatherEntity.Id, weatherEntity);
+                    }
+                    break;
                 default:
                     break;
             }
@@ -164,6 +171,9 @@ public sealed class EntitiesRepository : IEntitiesRepository
             {
                 case EntityType.Light:
                     json.Append(JsonSerializer.Serialize(entity as LightEntity));
+                    break;
+                case EntityType.Weather:
+                    json.Append(JsonSerializer.Serialize(entity as WeatherEntity));
                     break;
                 default:
                     break;

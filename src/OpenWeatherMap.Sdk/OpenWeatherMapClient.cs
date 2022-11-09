@@ -71,6 +71,7 @@ public class OpenWeatherMapClient : IOpenWeatherMapClient
             var minWeatherIdForecast = hourlyForecastWholeDay.Where(f => f.WeatherId == hourlyForecastWholeDay.Select(f => f.WeatherId).Min()).First();
             var rainForecast = hourlyForecastWholeDay.Where(f => f.RainLastThreeHours.HasValue).ToArray();
             var snowForecast = hourlyForecastWholeDay.Where(f => f.SnowLastThreeHours.HasValue).ToArray();
+
             var daylyForecast = new DailyForecast(
                 day,
                 hourlyForecast.Sunrise,
@@ -83,8 +84,8 @@ public class OpenWeatherMapClient : IOpenWeatherMapClient
                 hourlyForecastDay.Length > 0 ? hourlyForecastDay.Select(f => f.TemperatureFeelsLike).Max() : hourlyForecastWholeDay.Select(f => f.TemperatureFeelsLike).Max(),
                 hourlyForecastWholeDay.Select(f => f.TemperatureMin).Min(),
                 hourlyForecastWholeDay.Select(f => f.TemperatureMax).Max(),
-                hourlyForecastDay.Length > 0 ? hourlyForecastNight.Select(f => f.Temperature).Min() : hourlyForecastWholeDay.Select(f => f.Temperature).Min(),
-                hourlyForecastDay.Length > 0 ? hourlyForecastNight.Select(f => f.TemperatureFeelsLike).Min() : hourlyForecastWholeDay.Select(f => f.TemperatureFeelsLike).Min(),
+                hourlyForecastNight.Length > 0 ? hourlyForecastNight.Select(f => f.Temperature).Min() : hourlyForecastWholeDay.Select(f => f.Temperature).Min(),
+                hourlyForecastNight.Length > 0 ? hourlyForecastNight.Select(f => f.TemperatureFeelsLike).Min() : hourlyForecastWholeDay.Select(f => f.TemperatureFeelsLike).Min(),
                 hourlyForecastEvening.Length > 0 ? hourlyForecastEvening.Select(f => f.Temperature).Average() : hourlyForecastWholeDay.Select(f => f.Temperature).Average(),
                 hourlyForecastEvening.Length > 0 ? hourlyForecastEvening.Select(f => f.TemperatureFeelsLike).Average() : hourlyForecastWholeDay.Select(f => f.TemperatureFeelsLike).Average(),
                 hourlyForecastMorning.Length > 0 ? hourlyForecastMorning.Select(f => f.Temperature).Average() : hourlyForecastWholeDay.Select(f => f.Temperature).Average(),
@@ -144,7 +145,7 @@ public class OpenWeatherMapClient : IOpenWeatherMapClient
         var unitsPart = GetUnitsPart(units);
         var languagePart = GetLanguagePart(languageCode);
         var limitPart = limit.HasValue ? $"&cnt={limit}" : "";
-        return $"http://api.openweathermap.org/data/2.5/weather?lat={latitude}&lon={longitude}{unitsPart}{languagePart}{limitPart}";
+        return $"http://api.openweathermap.org/data/2.5/forecast?lat={latitude}&lon={longitude}{unitsPart}{languagePart}{limitPart}";
     }
 
     private static IEnumerable<GeoCoordinates> ParseJsonToGeoCoordinates(string json)
@@ -153,12 +154,13 @@ public class OpenWeatherMapClient : IOpenWeatherMapClient
         using var document = JsonDocument.Parse(json);
         foreach (var element in document.RootElement.EnumerateArray())
         {
+            var stateIsPresent = element.TryGetProperty("state", out var stateElement);
             var coordinates = new GeoCoordinates(
                  element.GetProperty("name").GetString()!,
                  element.GetProperty("lat").GetDouble(),
                  element.GetProperty("lon").GetDouble(),
                  element.GetProperty("country").GetString()!,
-                 element.GetProperty("state").GetString(),
+                 stateIsPresent ? stateElement.GetString() : null,
                  element.GetProperty("local_names").EnumerateObject().ToDictionary(e => e.Name, e => e.Value.GetString()!)
             );
             geoCoordinates.Add(coordinates);

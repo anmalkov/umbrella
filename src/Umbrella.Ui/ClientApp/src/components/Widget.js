@@ -51,6 +51,8 @@ const Widget = ({ widget, isEdit, deleteHandler, editHandler }) => {
                     default:
                     case 'light':
                         return <WidgetLight entity={entity} state={state} />;
+                    case 'weather':
+                        return <WidgetWeather entity={entity} state={state} />;
                 }
             case 'group':
                 if (!groupsList || !entitiesList || !statesList) {
@@ -84,8 +86,6 @@ const Widget = ({ widget, isEdit, deleteHandler, editHandler }) => {
                 const areaEntities = entitiesList.filter(e => e.areaId === area.id);
                 const areaStates = areaEntities.map(e => (statesList && statesList.find(s => s.id === e.id)) || {});
                 return <WidgetEntities name={area.name} entities={areaEntities} states={areaStates} />;
-            case 'weather':
-                return <WidgetWeather />;
         }
     }
 

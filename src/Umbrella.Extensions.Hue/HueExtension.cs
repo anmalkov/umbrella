@@ -127,6 +127,44 @@ public class HueExtension : IExtension
         }
     }
 
+    public Task UnregisterAsync(Dictionary<string, string?>? parameters)
+    {
+        return Task.CompletedTask;
+    }
+
+    public async Task StartAsync(Dictionary<string, string?>? parameters)
+    {
+        if (parameters is not null && parameters.ContainsKey(BridgeIpParameterName))
+        {
+            var bridgeIp = parameters[BridgeIpParameterName];
+            var appKey = parameters.ContainsKey(BridgeIpParameterName) ? parameters[AppKeyParameterName] : null;
+            if (!string.IsNullOrWhiteSpace(bridgeIp))
+            {
+                _hueClient = new HueClient(_httpClient, bridgeIp, appKey);
+            }
+        }
+        if (parameters is not null && parameters.ContainsKey(LightsIdsParameterName))
+        {
+            _lightsIds = JsonSerializer.Deserialize<List<LightId>>(parameters?[LightsIdsParameterName] ?? "") ?? new List<LightId>();
+        }
+
+        await ReportCurrentStateForLightsAsync();
+
+        _eventsService.Subscribe(EventNames.ChangeEntityState, OnChangeLightState);
+
+        StartListeningForEvents();
+    }
+
+    public Task StopAsync()
+    {
+        _eventsService.Unsubscribe(EventNames.ChangeEntityState, OnChangeLightState);
+
+        StopListeningForEvents();
+
+        return Task.CompletedTask;
+    }
+
+
     private async Task AddAllGroups(IEnumerable<LightId> lightIds)
     {
         if (_hueClient is null)
@@ -183,41 +221,6 @@ public class HueExtension : IExtension
         return lightsIds;
     }
 
-    public Task UnregisterAsync(Dictionary<string, string?>? parameters)
-    {
-        return Task.CompletedTask;
-    }
-    
-    public async Task StartAsync(Dictionary<string, string?>? parameters)
-    {
-        if (parameters is not null && parameters.ContainsKey(BridgeIpParameterName)) {
-            var bridgeIp = parameters[BridgeIpParameterName];
-            var appKey = parameters.ContainsKey(BridgeIpParameterName) ? parameters[AppKeyParameterName] : null;
-            if (!string.IsNullOrWhiteSpace(bridgeIp))
-            {
-                _hueClient = new HueClient(_httpClient, bridgeIp, appKey);
-            }
-        }
-        if (parameters is not null && parameters.ContainsKey(LightsIdsParameterName))
-        {
-            _lightsIds = JsonSerializer.Deserialize<List<LightId>>(parameters?[LightsIdsParameterName] ?? "") ?? new List<LightId>();
-        }
-        
-        await ReportCurrentStateForLightsAsync();
-        
-        _eventsService.Subscribe(EventNames.ChangeEntityState, OnChangeLightState);
-
-        StartListeningForEvents();
-    }
-
-    public Task StopAsync()
-    {
-        _eventsService.Unsubscribe(EventNames.ChangeEntityState, OnChangeLightState);
-
-        StopListeningForEvents();
-
-        return Task.CompletedTask;
-    }
 
 
     private void StartListeningForEvents()

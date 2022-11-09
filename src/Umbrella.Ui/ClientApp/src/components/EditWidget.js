@@ -12,8 +12,7 @@ const EditWidget = ({ oldWidget, saveHandler, cancelHandler }) => {
     const widgetTypes = [
         { id: 'entity', title: 'Entity' },
         { id: 'area', title: 'Area' },
-        { id: 'group', title: 'Group' },
-        { id: 'weather', title: 'Weather' }
+        { id: 'group', title: 'Group' }
     ];
 
     const [widget, setWidget] = useState({ ...oldWidget });
@@ -136,13 +135,6 @@ const EditWidget = ({ oldWidget, saveHandler, cancelHandler }) => {
                                 )
                             }
                         </Input>
-                    </FormGroup>
-                )
-                : widget.type === 'weather' ?
-                (
-                    <FormGroup>
-                        <Label for="exampleEmail">City</Label>
-                        <Input type="text" value={getParameter('city')} onChange={targetIdChangeHandler} />
                     </FormGroup>
                 ) : null
             }

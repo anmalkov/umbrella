@@ -31,6 +31,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Umbrella.Core\Umbrella.Core.csproj" />
     <ProjectReference Include="..\Umbrella.Extensions.Hue\Umbrella.Extensions.Hue.csproj" />
+    <ProjectReference Include="..\Umbrella.Extensions.OpenWeatherMap\Umbrella.Extensions.OpenWeatherMap.csproj" />
     <ProjectReference Include="..\Umbrella.Extensions.Xiaomi\Umbrella.Extensions.Xiaomi.csproj" />
   </ItemGroup>
 

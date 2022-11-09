@@ -1,11 +1,13 @@
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
+using OpenWeatherMap.Sdk.Exceptions;
 using System;
 using Umbrella.Core.Extensions;
 using Umbrella.Core.Repositories;
 using Umbrella.Core.Services;
 using Umbrella.Extensions.Hue;
+using Umbrella.Extensions.OpenWeatherMap;
 using Umbrella.Extensions.Xiaomi;
 using Umbrella.Ui.Extensions;
 using Umbrella.Ui.Hubs;
@@ -20,6 +22,7 @@ builder.Services.AddSignalR();
 
 builder.Services.AddSingleton<IExtension, HueExtension>();
 builder.Services.AddSingleton<IExtension, XiaomiExtension>();
+builder.Services.AddSingleton<IExtension, OpenWeatherMapExtension>();
 
 builder.Services.AddSingleton<IEventsService, EventsService>();
 builder.Services.AddSingleton<IEntitiesStateService, EntitiesStateService>();

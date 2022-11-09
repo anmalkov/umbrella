@@ -26,6 +26,12 @@ public sealed class RegistrationService : IRegistrationService
         await _entitiesService.RegisterAsync(entity);
     }
 
+    public async Task<IEntity?> GetEntityAsync(string id, string extensionId)
+    {
+        var entity = await _entitiesService.GetAsync(id);
+        return entity is not null && entity.Owner == extensionId ? entity : null;
+    }
+
     public async Task AddAreaAsync(Area area, string extensionId)
     {
         await _areasService.AddAsync(area);

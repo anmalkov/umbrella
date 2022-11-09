@@ -11,6 +11,6 @@ public record GeoCoordinates (
     double Latitude,
     double Longitude,
     string CountryCode,
-    string? StateCode,
+    string? State,
     IDictionary<string, string> LocalNames
 );

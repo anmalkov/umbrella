@@ -35,7 +35,7 @@ public record WeatherHourlyForecast (
 public sealed class WeatherEntityState : IEntityState
 {
     public bool? Connected { get; set; } = default;
-    public string UpdatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
     public string Condition { get; set; }
     public double Temperature { get; set; }
     public double? TemperatureFeelsLike { get; set; }
