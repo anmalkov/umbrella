@@ -2,6 +2,7 @@
 using OpenWeatherMap.Sdk.Models;
 using System.Net.Http;
 using System.Text.Json;
+using System.Threading;
 using Umbrella.Core.Events;
 using Umbrella.Core.Extensions;
 using Umbrella.Core.Models;
@@ -19,6 +20,7 @@ public class OpenWeatherMapExtension : IExtension
     private const char CitiesDivider = ';';
     private const char CountryCodeDivider = ',';
     private const string EntitiesCoordinatesParameterName = "citiesCoordinates";
+    private const int UpdateWeatherIntervalInMinutes = 10;
 
     public string Id => "owm";
     public string? DisplayName => "Open Weather Map";
@@ -51,6 +53,7 @@ public class OpenWeatherMapExtension : IExtension
     private IOpenWeatherMapClient? _openWeatherMapClient;
     private IEnumerable<EntityCoordinates> _entitiesCoordinates;
     private bool _unitsIsMetric = true;
+    private CancellationTokenSource? _cancellationTokenSource = null;
 
 
     public OpenWeatherMapExtension(IRegistrationService coreService, IEventsService eventsService) : this(coreService, eventsService, null)
@@ -129,10 +132,25 @@ public class OpenWeatherMapExtension : IExtension
         }
 
         await ReportCurrentWeatherForEntitiesAsync();
+
+        UpdateWeatherRegularly();
+    }
+
+    private async Task UpdateWeatherRegularly()
+    {
+        var timer = new PeriodicTimer(TimeSpan.FromMinutes(UpdateWeatherIntervalInMinutes));
+
+        _cancellationTokenSource ??= new CancellationTokenSource();
+
+        while (await timer.WaitForNextTickAsync(_cancellationTokenSource.Token))
+        {
+            await ReportCurrentWeatherForEntitiesAsync();
+        }
     }
 
     public Task StopAsync()
     {
+        _cancellationTokenSource?.Cancel();
         return Task.CompletedTask;
     }
 
