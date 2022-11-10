@@ -45,7 +45,7 @@ const Dashboard = () => {
                     await connection.start();
                     console.log('Connected!');
                     connection.on('ReceiveStateUpdate', (id, state) => {
-                        console.log('ReceiveStateUpdate', id, state);
+                        //console.log('ReceiveStateUpdate', id, state);
                         queryClient.invalidateQueries(['states']);
                         queryClient.refetchQueries('states', { force: true });
                     });
@@ -56,7 +56,7 @@ const Dashboard = () => {
             }
         }
         connect();
-    }, [connection]);    
+    }, [connection]);
 
     useEffect(() => {
         if (!currentDashboard && data && data.length > 0) {

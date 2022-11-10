@@ -7,9 +7,6 @@ const WidgetWeather = ({ entity, state }) => {
 
     const error = null;
 
-    console.log(entity);
-    console.log(state);
-    
     return (
         <CardBody>
             {error ? <UncontrolledAlert color="danger">{error.message}</UncontrolledAlert> : null}
