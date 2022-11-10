@@ -6,6 +6,7 @@ import { useMutation } from 'react-query';
 const WidgetWeather = ({ entity, state }) => {
 
     const error = null;
+    const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
     return (
         <CardBody>
@@ -17,32 +18,22 @@ const WidgetWeather = ({ entity, state }) => {
             </CardTitle>
             <Row className="mb-2">
                 <Col>
-                    <p>i</p>
+                    <p></p>
                 </Col>
                 <Col>
                     <p>{state.condition}</p>
                 </Col>
                 <Col>
-                    <p>{state.temperature} {state.temperatureUnit}</p>
-                    <p>feels {state.temperatureFeelsLike}</p>
+                    <p><b>{state.temperature.toFixed(0)} {state.temperatureUnit}</b><br />feels {state.temperatureFeelsLike.toFixed(0)}</p>
                 </Col>
             </Row>
-            <Row className="mb-2">
-                <Col>
-                    <p>1</p>
-                </Col>
-                <Col>
-                    <p>2</p>
-                </Col>
-                <Col>
-                    <p>3</p>
-                </Col>
-                <Col>
-                    <p>4</p>
-                </Col>
-                <Col>
-                    <p>5</p>
-                </Col>
+            <Row>
+                {state.dailyForecast.slice(1, 6).map(forecast => (
+                    <Col key={forecast.date}>
+                        <p>{weekDays[(new Date(forecast.date)).getDay()]}<br />{forecast.temperatureDay.toFixed(0)}<br />{forecast.temperatureNight.toFixed(0)}</p>
+                    </Col>
+
+                ))}
             </Row>
         </CardBody>
     );
