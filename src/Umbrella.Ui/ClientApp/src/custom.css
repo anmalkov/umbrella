@@ -72,6 +72,10 @@ th {
     color: var(--text-color-disabled);
 }
 
+.fs-7 {
+    font-size: 0.8em;
+}
+
 
 /* Provide sufficient contrast against white background */
 a {

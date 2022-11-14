@@ -1,6 +1,7 @@
 ﻿using OpenWeatherMap.Sdk;
 using OpenWeatherMap.Sdk.Models;
 using System.Net.Http;
+using System.Reflection.Metadata.Ecma335;
 using System.Text.Json;
 using System.Threading;
 using Umbrella.Core.Events;
@@ -172,7 +173,9 @@ public class OpenWeatherMapExtension : IExtension
             var state = new WeatherEntityState
             {
                 UpdatedAt = currentWeather.UpdatedAt,
+                ConditionCode = GetWeatherCondition(currentWeather.WeatherId),
                 Condition = currentWeather.WeatherMain,
+                ConditionDescription = currentWeather.WeatherDescription,
                 Temperature = currentWeather.Temperature,
                 TemperatureFeelsLike = currentWeather.TemperatureFeelsLike,
                 TemperatureUnit = units == WeatherUnits.Metric ? "°C" : "°F",
@@ -185,9 +188,13 @@ public class OpenWeatherMapExtension : IExtension
                 WindSpeed = currentWeather.WindSpeed,
                 WindSpeedUnit = units == WeatherUnits.Metric ? "m/s" : "m/h",
                 WindDegree = currentWeather.WindDegree,
+                Sunrise = currentWeather.Sunrise,
+                Sunset = currentWeather.Sunset,
                 DailyForecast = dailyForecast.DailyForecast.Select(f => new Core.Models.WeatherDailyForecast(
                     f.ForecastDateTime,
+                    GetWeatherCondition(f.WeatherId),
                     f.WeatherMain,
+                    f.WeatherDescription,
                     f.TemperatureDay,
                     f.TemperatureNight,
                     f.Pressure,
@@ -195,11 +202,15 @@ public class OpenWeatherMapExtension : IExtension
                     f.PrecipitationProbability,
                     f.Humidity,
                     f.WindSpeed,
-                    f.WindDegree
+                    f.WindDegree,
+                    f.Sunrise,
+                    f.Sunset
                 )),
                 HourlyForecast = hourlyForecast.HourlyForecast.Select(f => new Core.Models.WeatherHourlyForecast(
                     f.ForecastDateTime,
+                    GetWeatherCondition(f.WeatherId),
                     f.WeatherMain,
+                    f.WeatherDescription,
                     f.Temperature,
                     f.TemperatureFeelsLike,
                     f.Pressure,
@@ -207,11 +218,49 @@ public class OpenWeatherMapExtension : IExtension
                     f.PrecipitationProbability,
                     f.Humidity,
                     f.WindSpeed,
-                    f.WindDegree
+                    f.WindDegree,
+                    f.PartOfDay == WeatherPartOfDay.Night
                 )),
             };
             _eventsService.Publish(new EntityStateChangedEvent(entityCoordinate.EntityId, state));
         }
+    }
+
+    private static WeatherCondition GetWeatherCondition(int weatherId)
+    {
+        return weatherId switch
+        {
+            // clouds
+            800 => WeatherCondition.Clear,
+            801 => WeatherCondition.FewClouds,
+            802 => WeatherCondition.BrokenClouds,
+            803 => WeatherCondition.MostlyCloudy,
+            804 => WeatherCondition.Cloudy,
+            _ when weatherId >= 800 && weatherId < 900 => WeatherCondition.Cloudy,
+
+            // rain
+            500 => WeatherCondition.ScatteredShowers,
+            501 => WeatherCondition.LightRain,
+            502 => WeatherCondition.ModerateRain,
+            _ when weatherId >= 503 && weatherId <= 531 => WeatherCondition.HeavyRain,
+            _ when weatherId >= 300 && weatherId < 600 => WeatherCondition.LightRain,
+
+            // tstorms
+            210 => WeatherCondition.ScatteredTstorms,
+            _ when weatherId >= 200 && weatherId < 300 => WeatherCondition.Tstorms,
+
+            // snow
+            _ when weatherId >= 600 && weatherId <= 601 => WeatherCondition.LightSnow,
+            602 => WeatherCondition.HeavySnow,
+            _ when weatherId >= 611 && weatherId <= 616 => WeatherCondition.RainSnow,
+            622 => WeatherCondition.Blizzard,
+            _ when weatherId >= 600 && weatherId < 700 => WeatherCondition.LightSnow,
+            
+            // fog
+            _ when weatherId >= 700 && weatherId < 800 => WeatherCondition.Fog,
+            
+            _ => WeatherCondition.Clear
+        };
     }
 
     private static double? GetPrecipitation(double? rain, double? snow)
