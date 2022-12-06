@@ -29,7 +29,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenWeatherMap.Sdk", "OpenW
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenWeatherMap.Sdk.Tests", "OpenWeatherMap.Sdk.Tests\OpenWeatherMap.Sdk.Tests.csproj", "{F122924B-0B10-4BE6-9F8F-DC20F132C2E1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbrella.Extensions.OpenWeatherMap", "Umbrella.Extensions.OpenWeatherMap\Umbrella.Extensions.OpenWeatherMap.csproj", "{F13475DD-706F-4CFF-B291-224D89001AA1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbrella.Extensions.OpenWeatherMap", "Umbrella.Extensions.OpenWeatherMap\Umbrella.Extensions.OpenWeatherMap.csproj", "{F13475DD-706F-4CFF-B291-224D89001AA1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xiaomi.Sdk", "Xiaomi.Sdk\Xiaomi.Sdk.csproj", "{ECD0E5F3-16F8-4E01-8444-6074649BB9BE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xiaomi.Sdk.Tests", "Xiaomi.Sdk.Tests\Xiaomi.Sdk.Tests.csproj", "{F59E81DD-7D69-48DA-809E-9CC18AF9D67E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -81,6 +85,14 @@ Global
 		{F13475DD-706F-4CFF-B291-224D89001AA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F13475DD-706F-4CFF-B291-224D89001AA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F13475DD-706F-4CFF-B291-224D89001AA1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ECD0E5F3-16F8-4E01-8444-6074649BB9BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECD0E5F3-16F8-4E01-8444-6074649BB9BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECD0E5F3-16F8-4E01-8444-6074649BB9BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECD0E5F3-16F8-4E01-8444-6074649BB9BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F59E81DD-7D69-48DA-809E-9CC18AF9D67E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F59E81DD-7D69-48DA-809E-9CC18AF9D67E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F59E81DD-7D69-48DA-809E-9CC18AF9D67E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F59E81DD-7D69-48DA-809E-9CC18AF9D67E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
