@@ -45,9 +45,10 @@ public class XiaomiClient : IXiaomiClient
         _cloudClient = new XiaomiCloudClient(httpClient);
     }
 
-    public async Task<IEnumerable<XiaomiCloudDevice>> GetDevicesFromCloudAsync(string username, string password, string serverCountryCode)
+
+    public async Task<IEnumerable<XiaomiCloudDevice>> GetAllDevicesFromCloudAsync(string username, string password, string serverCountryCode)
     {
-        return await _cloudClient.GetDevicesAsync(username, password, serverCountryCode);
+        return await _cloudClient.GetAllDevicesAsync(username, password, serverCountryCode);
     }
 
     public async Task<IEnumerable<XiaomiDevice>> GetAllDevicesAsync()
@@ -102,6 +103,27 @@ public class XiaomiClient : IXiaomiClient
         );
     }
 
+    public void StartListeningForEvents(CancellationToken? cancellationToken = null)
+    {
+        StopListeningForEvents();
+
+        _eventStreamCancellationTokenSource = cancellationToken.HasValue
+            ? CancellationTokenSource.CreateLinkedTokenSource(cancellationToken!.Value)
+            : new CancellationTokenSource();
+
+        var tokenToCancel = _eventStreamCancellationTokenSource.Token;
+
+        _transport = new UdpTransport(_ip, "test");
+
+        StartListening(tokenToCancel);
+    }
+
+    public void StopListeningForEvents()
+    {
+        _eventStreamCancellationTokenSource?.Cancel();
+    }
+
+
     private async Task<XiaomiResponse?> SendCommandAndWaitForReply(ICommand command)
     {
         if (!_listeningForEvents)
@@ -132,21 +154,6 @@ public class XiaomiClient : IXiaomiClient
         await task.WaitAsync(TimeSpan.FromSeconds(5));
         
         return receivedResponse;
-    }
-
-    public void StartListeningForEvents(CancellationToken? cancellationToken = null)
-    {
-        StopListeningForEvents();
-
-        _eventStreamCancellationTokenSource = cancellationToken.HasValue
-            ? CancellationTokenSource.CreateLinkedTokenSource(cancellationToken!.Value)
-            : new CancellationTokenSource();
-
-        var tokenToCancel = _eventStreamCancellationTokenSource.Token;
-
-        _transport = new UdpTransport(_ip, "test");
-
-        StartListening(tokenToCancel);
     }
 
     private async Task StartListening(CancellationToken tokenToCancel)
@@ -182,10 +189,5 @@ public class XiaomiClient : IXiaomiClient
             _transport?.Dispose();
             _transport = null;
         }
-    }
-
-    public void StopListeningForEvents()
-    {
-        _eventStreamCancellationTokenSource?.Cancel();
     }
 }

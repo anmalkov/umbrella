@@ -32,7 +32,7 @@ public class XiaomiCloudClient : IXiaomiCloudClient
     }
 
     
-    public async Task<IEnumerable<XiaomiCloudDevice>> GetDevicesAsync(string username, string password, string serverCountryCode)
+    public async Task<IEnumerable<XiaomiCloudDevice>> GetAllDevicesAsync(string username, string password, string serverCountryCode)
     {
         if (!_loggedIn)
         {

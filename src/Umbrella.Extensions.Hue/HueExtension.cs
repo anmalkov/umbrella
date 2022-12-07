@@ -84,19 +84,10 @@ public class HueExtension : IExtension
     
     public async Task RegisterAsync(Dictionary<string, string?>? parameters)
     {
-        if (parameters is null || !parameters.ContainsKey(BridgeIpParameterName))
-        {
-            throw new ArgumentException($"Missing required parameter '{BridgeIpParameterName}'");
-        }
-
-        var bridgeIp = parameters[BridgeIpParameterName];
-        if (string.IsNullOrWhiteSpace(bridgeIp))
-        {
-            throw new ArgumentException($"Parameter '{BridgeIpParameterName}' must have a value");
-        }
+        var bridgeIp = GetParameter(parameters, BridgeIpParameterName, parameterRequired: true);
 
         var importRooms = false;
-        if (parameters.ContainsKey(ImportRoomsParameterName))
+        if (parameters!.ContainsKey(ImportRoomsParameterName))
         {
             importRooms = bool.Parse(parameters[ImportRoomsParameterName]);
             parameters.Remove(ImportRoomsParameterName);
@@ -219,9 +210,8 @@ public class HueExtension : IExtension
         }
         return lightsIds;
     }
-
-
-
+    
+    
     private void StartListeningForEvents()
     {
         if (_hueClient is null) {
@@ -376,4 +366,23 @@ public class HueExtension : IExtension
         };
     }
 
+    private static string? GetParameter(Dictionary<string, string?>? parameters, string parameterName, bool parameterRequired)
+    {
+        if (parameters is null || !parameters.ContainsKey(parameterName))
+        {
+            if (!parameterRequired)
+            {
+                return null;
+            }
+            throw new ArgumentException($"Missing required parameter '{parameterName}'");
+        }
+
+        var value = parameters[parameterName];
+        if (parameterRequired && string.IsNullOrWhiteSpace(value))
+        {
+            throw new ArgumentException($"Parameter '{parameterName}' must have a value");
+        }
+
+        return value;
+    }
 }

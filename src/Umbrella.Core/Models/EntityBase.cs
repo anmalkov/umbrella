@@ -3,7 +3,7 @@
 public enum EntityType
 {
     Light = 1,
-    Weather = 2
+    Weather = 2,
 }
 
 public class EntityBase : IEntity
