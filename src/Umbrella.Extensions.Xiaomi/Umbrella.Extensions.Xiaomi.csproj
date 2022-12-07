@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Umbrella.Core\Umbrella.Core.csproj" />
+    <ProjectReference Include="..\Xiaomi.Sdk\Xiaomi.Sdk.csproj" />
   </ItemGroup>
 
 </Project>

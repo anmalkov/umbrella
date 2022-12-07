@@ -18,7 +18,6 @@ public class HueExtension : IExtension
     private const string BridgeIpParameterName = "bridgeIp";
     private const string ImportRoomsParameterName = "includeRooms";
     private const string ImportZonesParameterName = "includeZones";
-
     private const string AppKeyParameterName = "appKey";
     private const string ClientKeyParameterName = "clientKey";
     private const string LightsIdsParameterName = "ids";
