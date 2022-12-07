@@ -4,6 +4,8 @@ public enum EntityType
 {
     Light = 1,
     Weather = 2,
+    Temperature = 3,
+    Binary = 4
 }
 
 public class EntityBase : IEntity
