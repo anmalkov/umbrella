@@ -9,6 +9,7 @@ namespace Umbrella.Core.Models;
 public sealed class BinaryEntityState : IEntityState
 {
     public bool? Connected { get; set; } = default;
+    public byte? BatteryLevel { get; set; }
     public bool? IsOn { get; set; }
 
     public IEntityState Clone()
@@ -16,6 +17,7 @@ public sealed class BinaryEntityState : IEntityState
         return new BinaryEntityState
         {
             Connected = Connected,
+            BatteryLevel = BatteryLevel,
             IsOn = IsOn
         };
     }
@@ -30,7 +32,11 @@ public sealed class BinaryEntityState : IEntityState
         {
             return;
         }
-        
+
+        if (binaryState.BatteryLevel.HasValue)
+        {
+            BatteryLevel = binaryState.BatteryLevel;
+        }
         if (binaryState.IsOn.HasValue)
         {
             IsOn = binaryState.IsOn;
