@@ -84,7 +84,7 @@ public class HueExtension : IExtension
     
     public async Task RegisterAsync(Dictionary<string, string?>? parameters)
     {
-        var bridgeIp = GetParameter(parameters, BridgeIpParameterName, parameterRequired: true);
+        var bridgeIp = ExtensionsHelper.GetParameterValue(parameters, BridgeIpParameterName, parameterRequired: true);
 
         var importRooms = false;
         if (parameters!.ContainsKey(ImportRoomsParameterName))
@@ -318,13 +318,6 @@ public class HueExtension : IExtension
     }
 
     
-    private string GenerateEntityId(string name)
-    {
-        name = name.ToLower().Replace(' ', '_');
-        
-        return $"light.{Id}.{name}";
-    }
-
     private string GenerateAreaId(string name)
     {
         name = name.ToLower().Replace(' ', '_');
@@ -342,7 +335,7 @@ public class HueExtension : IExtension
     private LightEntity MapLightToEntity(PhilipsHueLight light, int index, string? areaId)
     {
         var name = light.Metadata?.Name ?? $"Light {index}";
-        return new LightEntity(GenerateEntityId(name))
+        return new LightEntity(ExtensionsHelper.GenerateEntityId(Id, EntityType.Light, name))
         {
             Name = name,
             AreaId = areaId,
@@ -364,25 +357,5 @@ public class HueExtension : IExtension
         return new Group(GenerateGroupId(name), name) {
             Entities = new List<string>(entities)
         };
-    }
-
-    private static string? GetParameter(Dictionary<string, string?>? parameters, string parameterName, bool parameterRequired)
-    {
-        if (parameters is null || !parameters.ContainsKey(parameterName))
-        {
-            if (!parameterRequired)
-            {
-                return null;
-            }
-            throw new ArgumentException($"Missing required parameter '{parameterName}'");
-        }
-
-        var value = parameters[parameterName];
-        if (parameterRequired && string.IsNullOrWhiteSpace(value))
-        {
-            throw new ArgumentException($"Parameter '{parameterName}' must have a value");
-        }
-
-        return value;
     }
 }

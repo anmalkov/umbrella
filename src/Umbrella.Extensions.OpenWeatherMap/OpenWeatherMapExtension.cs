@@ -88,9 +88,9 @@ public class OpenWeatherMapExtension : IExtension
 
     public async Task RegisterAsync(Dictionary<string, string?>? parameters)
     {
-        var apiKey = GetParameter(parameters, ApiKeyParameterName, true);
-        var cities = GetParameter(parameters, CitiesParameterName, true);
-        var units = GetParameter(parameters, UnitsParameterName, true);
+        var apiKey = ExtensionsHelper.GetParameterValue(parameters, ApiKeyParameterName, true);
+        var cities = ExtensionsHelper.GetParameterValue(parameters, CitiesParameterName, true);
+        var units = ExtensionsHelper.GetParameterValue(parameters, UnitsParameterName, true);
         if (units != "metric" && units != "imperial")
         {
             throw new ArgumentException($"Parameter '{UnitsParameterName}' should be either 'metric' or 'imperial'");
@@ -319,25 +319,4 @@ public class OpenWeatherMapExtension : IExtension
             Longitude = coordinates.Longitude,
         };
     }
-    
-    private static string? GetParameter(Dictionary<string, string?>? parameters, string parameterName, bool parameterRequired)
-    {
-        if (parameters is null || !parameters.ContainsKey(parameterName))
-        {
-            if (!parameterRequired)
-            {
-                return null;
-            }
-            throw new ArgumentException($"Missing required parameter '{parameterName}'");
-        }
-
-        var value = parameters[parameterName];
-        if (parameterRequired && string.IsNullOrWhiteSpace(value))
-        {
-            throw new ArgumentException($"Parameter '{parameterName}' must have a value");
-        }
-
-        return value;
-    }
-
 }

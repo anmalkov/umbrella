@@ -90,9 +90,9 @@ public class XiaomiExtension : IExtension
 
     public async Task RegisterAsync(Dictionary<string, string?>? parameters)
     {
-        var username = GetParameter(parameters, UsernameParameterName, parameterRequired: true);
-        var password = GetParameter(parameters, PasswordParameterName, parameterRequired: true);
-        var serverCountryCode = GetParameter(parameters, ServerCountryCodeParameterName, parameterRequired: true);
+        var username = ExtensionsHelper.GetParameterValue(parameters, UsernameParameterName, parameterRequired: true);
+        var password = ExtensionsHelper.GetParameterValue(parameters, PasswordParameterName, parameterRequired: true);
+        var serverCountryCode = ExtensionsHelper.GetParameterValue(parameters, ServerCountryCodeParameterName, parameterRequired: true);
         if (serverCountryCode != "cn" && serverCountryCode != "de" && serverCountryCode != "us" && serverCountryCode != "ru" &&
             serverCountryCode != "tw" && serverCountryCode != "sg" && serverCountryCode != "in" && serverCountryCode != "i2")
         {
@@ -156,12 +156,15 @@ public class XiaomiExtension : IExtension
         }
         else if (device.Model.ToLower().Contains("sensor_ht"))
         {
+            return MapTemperatureSensorToEntity(device, index);
         }
         else if (device.Model.ToLower().Contains("sensor_magnet"))
         {
+            return MapMagnetSensorToEntity(device, index);
         }
         else if (device.Model.ToLower().Contains("sensor_motion"))
         {
+            return MapMotionSensorToEntity(device, index);
         }
         else if (device.Model.ToLower().Contains("sensor_switch"))
         {
@@ -175,24 +178,31 @@ public class XiaomiExtension : IExtension
         return null;
     }
 
-
-    private static string? GetParameter(Dictionary<string, string?>? parameters, string parameterName, bool parameterRequired)
+    private IEntity MapTemperatureSensorToEntity(XiaomiCloudDevice device, int index)
     {
-        if (parameters is null || !parameters.ContainsKey(parameterName))
+        var name = !string.IsNullOrWhiteSpace(device.Name) ? device.Name : $"Temperature {index}";
+        return new TemperatureEntity(ExtensionsHelper.GenerateEntityId(Id, EntityType.Temperature, name))
         {
-            if (!parameterRequired)
-            {
-                return null;
-            }
-            throw new ArgumentException($"Missing required parameter '{parameterName}'");
-        }
-
-        var value = parameters[parameterName];
-        if (parameterRequired && string.IsNullOrWhiteSpace(value))
+            Name = name,
+            Enabled = true
+        };
+    }
+    private IEntity MapMotionSensorToEntity(XiaomiCloudDevice device, int index)
+    {
+        var name = !string.IsNullOrWhiteSpace(device.Name) ? device.Name : $"Motion {index}";
+        return new BinaryEntity(ExtensionsHelper.GenerateEntityId(Id, EntityType.Binary, name), BinaryEntityType.Motion)
         {
-            throw new ArgumentException($"Parameter '{parameterName}' must have a value");
-        }
-
-        return value;
+            Name = name,
+            Enabled = true
+        };
+    }
+    private IEntity MapMagnetSensorToEntity(XiaomiCloudDevice device, int index)
+    {
+        var name = !string.IsNullOrWhiteSpace(device.Name) ? device.Name : $"Magnet {index}";
+        return new BinaryEntity(ExtensionsHelper.GenerateEntityId(Id, EntityType.Binary, name), BinaryEntityType.Opening)
+        {
+            Name = name,
+            Enabled = true
+        };
     }
 }
