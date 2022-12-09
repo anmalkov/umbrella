@@ -86,7 +86,10 @@ public class XiaomiClient : IXiaomiClient
 
     public void StartListeningForEvents(CancellationToken? cancellationToken = null)
     {
-        StopListeningForEvents();
+        if (_listeningForEvents)
+        {
+            return;
+        }
 
         _eventStreamCancellationTokenSource = cancellationToken.HasValue
             ? CancellationTokenSource.CreateLinkedTokenSource(cancellationToken!.Value)

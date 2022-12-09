@@ -231,7 +231,7 @@ public class XiaomiCloudClient : IXiaomiCloudClient
 
         var json = await GetJsonDocumentFrom(response);
         var ssecurity = json.RootElement.GetProperty("ssecurity").GetString();
-        if (string.IsNullOrWhiteSpace(ssecurity) || ssecurity.Length > 4)
+        if (string.IsNullOrWhiteSpace(ssecurity) || ssecurity.Length <= 4)
         {
             var notificationUrl = json.RootElement.GetProperty("notificationUrl").GetString();
             if (!string.IsNullOrWhiteSpace(notificationUrl))
