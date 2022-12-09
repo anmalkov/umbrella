@@ -1,5 +1,7 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 using System.Text.Json;
+using Umbrella.Core.Events;
 using Umbrella.Core.Extensions;
 using Umbrella.Core.Models;
 using Umbrella.Core.Services;
@@ -23,6 +25,7 @@ public class XiaomiExtension : IExtension
     private readonly IEventsService _eventsService;
     
     private IXiaomiClient _xiaomiClient;
+    private IEnumerable<DeviceId> _devicesIds;
 
     public string Id => "mi";
     public string? DisplayName => "Xiaomi";
@@ -85,8 +88,7 @@ public class XiaomiExtension : IExtension
     {
         _xiaomiClient = xiaomiClient;
     }
-
-    
+        
 
     public async Task RegisterAsync(Dictionary<string, string?>? parameters)
     {
@@ -121,17 +123,232 @@ public class XiaomiExtension : IExtension
     }
 
 
-    public Task StartAsync(Dictionary<string, string?>? parameters)
+    public async Task StartAsync(Dictionary<string, string?>? parameters)
     {
-        throw new NotImplementedException();
+        if (parameters is not null && parameters.ContainsKey(GatewayIpParameterName))
+        {
+            var gatewayIp = parameters[GatewayIpParameterName];
+            if (!string.IsNullOrWhiteSpace(gatewayIp))
+            {
+                _xiaomiClient = new XiaomiClient(_httpClient, gatewayIp);
+            }
+        }
+        if (parameters is not null && parameters.ContainsKey(DevicesIdsParameterName))
+        {
+            _devicesIds = JsonSerializer.Deserialize<IEnumerable<DeviceId>>(parameters?[DevicesIdsParameterName] ?? "") ?? new List<DeviceId>();
+        }
+
+        await ReportCurrentStateForDevicesAsync();
+
+        _eventsService.Subscribe(EventNames.ChangeEntityState, OnChangeDeviceState);
+
+        StartListeningForEvents();
     }
 
     public Task StopAsync()
     {
-        throw new NotImplementedException();
+        _eventsService.Unsubscribe(EventNames.ChangeEntityState, OnChangeDeviceState);
+
+        StopListeningForEvents();
+        
+        return Task.CompletedTask;
     }
 
 
+    private void StartListeningForEvents()
+    {
+        if (_xiaomiClient is null)
+        {
+            return;
+        }
+
+        _xiaomiClient.OnEventMessage += events => ProcessEventMessages(events);
+        _xiaomiClient.StartListeningForEvents();
+    }
+
+    private void StopListeningForEvents()
+    {
+        _xiaomiClient?.StopListeningForEvents();
+    }
+
+    private void ProcessEventMessages(XiaomiEventResponse @event)
+    {
+        var device = @event.Device;
+
+        var deviceId = _devicesIds.FirstOrDefault(d => d.XiaomiDeviceId == device.Id);
+        if (deviceId is null)
+        {
+            return;
+        }
+
+        var state = GetDeviceState(device);
+        if (state is null)
+        {
+            return;
+        }
+
+        _eventsService.Publish(new EntityStateChangedEvent(deviceId.EntityId, state));
+    }
+
+    private async Task ReportCurrentStateForDevicesAsync()
+    {
+        if (_xiaomiClient is null || !_devicesIds.Any())
+        {
+            return;
+        }
+
+        var devices = await _xiaomiClient.GetAllDevicesAsync();
+        foreach (var deviceId in _devicesIds)
+        {
+            var device = devices.FirstOrDefault(d => d.Id == deviceId.XiaomiDeviceId);
+            if (device is null)
+            {
+                continue;
+            }
+
+            var state = GetDeviceState(device);
+            if (state is null)
+            {
+                continue;
+            }
+            
+            _eventsService.Publish(new EntityStateChangedEvent(deviceId.EntityId, state));
+        }
+    }
+
+    private static IEntityState? GetDeviceState(XiaomiDevice device)
+    {
+        if (device.Properties is null)
+        {
+            return null;
+        }
+
+        var model = device.Model.ToLower();
+        if (model.Contains("gateway"))
+        {
+        }
+        else if (model.Contains("sensor_ht"))
+        {
+            return new TemperatureEntityState
+            {
+                BatteryLevel = GetBatteryLevel(device.Properties),
+                Temperature = GetTemperature(device.Properties),
+                Humidity = GetHumidity(device.Properties)
+            };
+        }
+        else if (model.Contains("magnet"))
+        {
+            return new BinaryEntityState
+            {
+                BatteryLevel = GetBatteryLevel(device.Properties),
+                IsOn = GetMagnetSensorStatus(device.Properties)
+            };
+        }
+        else if (model.Contains("motion"))
+        {
+            return new BinaryEntityState
+            {
+                BatteryLevel = GetBatteryLevel(device.Properties),
+                IsOn = GetMotionSensorStatus(device.Properties)
+            };
+        }
+        else if (model.Contains("sensor_switch"))
+        {
+        }
+        else if (model.Contains("light"))
+        {
+        }
+        else if (model.Contains("vacuum"))
+        {
+        }
+        
+        return null;
+    }
+
+    private static bool? GetMotionSensorStatus(IDictionary<string, string> properties)
+    {
+        var status = GetPropertyStringValue(properties, "status");
+        if (string.IsNullOrWhiteSpace(status))
+        {
+            var noMotion = GetPropertyStringValue(properties, "no_motion");
+            return !string.IsNullOrWhiteSpace(noMotion) ? false : null;
+        }
+        return status.ToLower() == "motion";
+    }
+    
+    private static bool? GetMagnetSensorStatus(IDictionary<string, string> properties)
+    {
+        var status = GetPropertyStringValue(properties, "status");
+        if (string.IsNullOrWhiteSpace(status))
+        {
+            return null;
+        }
+        return status.ToLower() == "open";
+    }
+
+    private static byte? GetBatteryLevel(IDictionary<string, string> properties)
+    {
+        var voltage = GetPropertyIntegerValue(properties, "voltage");
+        return voltage switch
+        {
+            null => null,
+            <= 2735 => 0,
+            >= 3100 => 100,
+            _ => (byte?)((((voltage - 2735) / (3100 - 2735)) * 100))
+        };
+    }
+
+    private static double? GetTemperature(IDictionary<string, string> properties)
+    {
+        var temperature = GetPropertyIntegerValue(properties, "temperature");
+        return temperature is not null ? temperature / 100 : null;
+    }
+
+    private static double? GetHumidity(IDictionary<string, string> properties)
+    {
+        var humidity = GetPropertyIntegerValue(properties, "humidity");
+        return humidity is not null ? humidity / 100 : null;
+    }
+
+    private static int? GetPropertyIntegerValue(IDictionary<string, string> properties, string propertyName)
+    {
+        if (!properties.ContainsKey(propertyName) || string.IsNullOrWhiteSpace(properties[propertyName]))
+        {
+            return null;
+        };
+        return int.TryParse(properties[propertyName], out var number) ? number : null;
+    }
+
+    private static string? GetPropertyStringValue(IDictionary<string, string> properties, string propertyName)
+    {
+        return properties.ContainsKey(propertyName) ? properties[propertyName] : null;
+    }
+    
+    private void OnChangeDeviceState(IEvent? payload)
+    {
+        if (payload is null || payload is not ChangeEntityStateEvent changeEntityStateEvent)
+        {
+            return;
+        }
+
+        //var state = changeEntityStateEvent.State as LightEntityState;
+        //if (state is null)
+        //{
+        //    return;
+        //}
+
+        //var lightId = _lightsIds.FirstOrDefault(l => l.EntityId == changeEntityStateEvent.EntityId);
+        //if (lightId is null)
+        //{
+        //    return;
+        //}
+        //var _ = (_hueClient!.UpdateLightAsync(lightId.HueId, new PhilipsHueUpdateLight
+        //{
+        //    On = state.TurnedOn is not null ? new() { TurnedOn = state.TurnedOn.Value } : null,
+        //    Dimming = state.Brightness is not null ? new() { Brightness = state.Brightness.Value } : null
+        //})).Result;
+    }
+    
     private async Task<(string? gatewayId, IEnumerable<DeviceId> devicesIds)> AddAllDevicesAsync(string username, string password, string serverCountryCode)
     {
         if (_xiaomiClient is null)
@@ -160,28 +377,29 @@ public class XiaomiExtension : IExtension
 
     private IEntity? MapCloudDeviceToEntity(XiaomiCloudDevice device, int index)
     {
-        if (device.Model.ToLower().Contains("gateway"))
+        var model = device.Model.ToLower();
+        if (model.Contains("gateway"))
         {
         }
-        else if (device.Model.ToLower().Contains("sensor_ht"))
+        else if (model.Contains("sensor_ht"))
         {
             return MapTemperatureSensorToEntity(device, index);
         }
-        else if (device.Model.ToLower().Contains("sensor_magnet"))
+        else if (model.Contains("sensor_magnet"))
         {
             return MapMagnetSensorToEntity(device, index);
         }
-        else if (device.Model.ToLower().Contains("sensor_motion"))
+        else if (model.Contains("sensor_motion"))
         {
             return MapMotionSensorToEntity(device, index);
         }
-        else if (device.Model.ToLower().Contains("sensor_switch"))
+        else if (model.Contains("sensor_switch"))
         {
         }
-        else if (device.Model.ToLower().Contains("light"))
+        else if (model.Contains("light"))
         {
         }
-        else if (device.Model.ToLower().Contains("vacuum"))
+        else if (model.Contains("vacuum"))
         {
         }
         return null;
@@ -196,6 +414,7 @@ public class XiaomiExtension : IExtension
             Enabled = true
         };
     }
+    
     private IEntity MapMotionSensorToEntity(XiaomiCloudDevice device, int index)
     {
         var name = !string.IsNullOrWhiteSpace(device.Name) ? device.Name : $"Motion {index}";
@@ -205,6 +424,7 @@ public class XiaomiExtension : IExtension
             Enabled = true
         };
     }
+    
     private IEntity MapMagnetSensorToEntity(XiaomiCloudDevice device, int index)
     {
         var name = !string.IsNullOrWhiteSpace(device.Name) ? device.Name : $"Magnet {index}";

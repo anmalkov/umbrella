@@ -81,26 +81,7 @@ public class XiaomiClient : IXiaomiClient
     public async Task<XiaomiDevice?> GetDeviceAsync(string id)
     {
         var response = await SendCommandAndWaitForReply(new ReadCommand(id));
-        if (response is null)
-        {
-            return null;
-        }
-
-        var properties = new Dictionary<string, string>();
-        if (!string.IsNullOrWhiteSpace(response?.Data))
-        {
-            using var jsonDocument = JsonDocument.Parse(response.Data);
-            properties = jsonDocument.RootElement.EnumerateObject().ToDictionary(e => e.Name, e => e.Value.ValueKind.ToString() switch { 
-                "Number" => e.Value.GetInt32().ToString(),
-                _ => e.Value.GetString() ?? ""
-            });
-        }
-
-        return new XiaomiDevice(
-            response.Sid,
-            response.Model,
-            properties
-        );
+        return GetDevice(response);
     }
 
     public void StartListeningForEvents(CancellationToken? cancellationToken = null)
@@ -156,6 +137,31 @@ public class XiaomiClient : IXiaomiClient
         return receivedResponse;
     }
 
+    private static XiaomiDevice? GetDevice(XiaomiResponse? response)
+    {
+        if (response is null)
+        {
+            return null;
+        }
+
+        var properties = new Dictionary<string, string>();
+        if (!string.IsNullOrWhiteSpace(response?.Data))
+        {
+            using var jsonDocument = JsonDocument.Parse(response.Data);
+            properties = jsonDocument.RootElement.EnumerateObject().ToDictionary(e => e.Name, e => e.Value.ValueKind.ToString() switch
+            {
+                "Number" => e.Value.GetInt32().ToString(),
+                _ => e.Value.GetString() ?? ""
+            });
+        }
+
+        return new XiaomiDevice(
+            response.Sid,
+            response.Model,
+            properties
+        );
+    }
+
     private async Task StartListening(CancellationToken tokenToCancel)
     {
         try
@@ -175,7 +181,11 @@ public class XiaomiClient : IXiaomiClient
                         }
                         break;
                     case "report":
-                        OnEventMessage?.Invoke(new XiaomiEventResponse());
+                        var device = GetDevice(response);
+                        if (device is not null)
+                        {
+                            OnEventMessage?.Invoke(new XiaomiEventResponse(device));
+                        }
                         break;
                 }
             }

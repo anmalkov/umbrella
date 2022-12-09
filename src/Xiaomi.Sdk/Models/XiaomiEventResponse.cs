@@ -7,5 +7,5 @@ using System.Threading.Tasks;
 namespace Xiaomi.Sdk.Models;
 
 public record XiaomiEventResponse(
-    
+    XiaomiDevice Device
 );
