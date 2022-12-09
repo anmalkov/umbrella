@@ -15,7 +15,7 @@ public class XiaomiExtension : IExtension
     private const string UsernameParameterName = "username";
     private const string PasswordParameterName = "password";
     private const string ServerCountryCodeParameterName = "server";
-    //private const string GatewayIpParameterName = "gatewayIp";
+    private const string GatewayIpParameterName = "gatewayIp";
     private const string DevicesIdsParameterName = "ids";
 
     private readonly HttpClient _httpClient;
@@ -101,8 +101,14 @@ public class XiaomiExtension : IExtension
 
         _xiaomiClient = new XiaomiClient(_httpClient);
 
-        var devicesIds = await AddAllDevicesAsync(username!, password!, serverCountryCode);
-        parameters!.Add(DevicesIdsParameterName, JsonSerializer.Serialize(devicesIds));
+        (var gatewayId, var devicesIds) = await AddAllDevicesAsync(username!, password!, serverCountryCode);
+        if (string.IsNullOrWhiteSpace(gatewayId))
+        {
+            throw new Exception("Gateway not found");
+        }
+
+        parameters!.Add(GatewayIpParameterName, gatewayId);
+        parameters.Add(DevicesIdsParameterName, JsonSerializer.Serialize(devicesIds));
 
         parameters.Remove(UsernameParameterName);
         parameters.Remove(PasswordParameterName);
@@ -125,14 +131,16 @@ public class XiaomiExtension : IExtension
     }
 
 
-    private async Task<IEnumerable<DeviceId>> AddAllDevicesAsync(string username, string password, string serverCountryCode)
+    private async Task<(string? gatewayId, IEnumerable<DeviceId> devicesIds)> AddAllDevicesAsync(string username, string password, string serverCountryCode)
     {
         if (_xiaomiClient is null)
         {
-            return new List<DeviceId>();
+            return (null, new List<DeviceId>());
         }
 
         var devices = await _xiaomiClient.GetAllDevicesFromCloudAsync(username!, password!, serverCountryCode);
+        var gateway = devices.FirstOrDefault(d => d.Model.ToLower().Contains("gateway"));
+        
         int deviceIndex = 1;
         var devicesIds = new List<DeviceId>();
         foreach (var device in devices)
@@ -146,7 +154,7 @@ public class XiaomiExtension : IExtension
             await _registrationService.RegisterEntityAsync(entity, Id);
             devicesIds.Add(new DeviceId(device.Id, entity.Id));
         }
-        return devicesIds;
+        return (gateway is not null ? gateway.LocalIp : null, devicesIds);
     }
 
     private IEntity? MapCloudDeviceToEntity(XiaomiCloudDevice device, int index)
