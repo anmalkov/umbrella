@@ -115,17 +115,18 @@ public class XiaomiExtension : IExtension
         parameters.Remove(ServerCountryCodeParameterName);
     }
 
+    public Task UnregisterAsync(Dictionary<string, string?>? parameters)
+    {
+        return Task.CompletedTask;
+    }
+
+
     public Task StartAsync(Dictionary<string, string?>? parameters)
     {
         throw new NotImplementedException();
     }
 
     public Task StopAsync()
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task UnregisterAsync(Dictionary<string, string?>? parameters)
     {
         throw new NotImplementedException();
     }
