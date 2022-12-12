@@ -16,8 +16,8 @@ public sealed class BinaryEntity : EntityBase
 {
     public BinaryEntityType BinaryType { get; set; } = default;
     
-    public BinaryEntity(string id, BinaryEntityType type) : base(id, EntityType.Binary)
+    public BinaryEntity(string id, BinaryEntityType binaryType) : base(id, EntityType.Binary)
     {
-        BinaryType = type;
+        BinaryType = binaryType;
     }
 }

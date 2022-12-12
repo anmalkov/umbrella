@@ -128,6 +128,7 @@ public sealed class EntitiesRepository : IEntitiesRepository
             var entityJson = json.Substring(startIndex, endIndex - startIndex);
 
             var baseEntity = JsonSerializer.Deserialize<EntityBase>(entityJson);
+            try { 
             switch (baseEntity?.Type)
             {
                 case EntityType.Light:
@@ -160,6 +161,11 @@ public sealed class EntitiesRepository : IEntitiesRepository
                     break;
                 default:
                     break;
+            }
+            }
+            catch (Exception ex)
+            {
+                
             }
 
             offset = endIndex + 1;

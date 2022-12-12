@@ -295,7 +295,7 @@ public class XiaomiExtension : IExtension
             null => null,
             <= 2735 => 0,
             >= 3100 => 100,
-            _ => (byte?)((((voltage - 2735) / (3100 - 2735)) * 100))
+            _ => (byte?)((((double)(voltage - 2735) / (double)(3100 - 2735)) * 100))
         };
     }
 
