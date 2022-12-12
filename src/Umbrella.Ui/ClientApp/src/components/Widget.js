@@ -8,6 +8,8 @@ import { fetchStates } from '../fetchers/states';
 import WidgetLight from './WidgetLight';
 import WidgetEntities from './WidgetEntities';
 import WidgetWeather from './WidgetWeather';
+import WidgetTemperature from './WidgetTemperature';
+import WidgetBinary from './WidgetBinary';
 
 const Widget = ({ widget, isEdit, deleteHandler, editHandler }) => {
 
@@ -53,6 +55,11 @@ const Widget = ({ widget, isEdit, deleteHandler, editHandler }) => {
                         return <WidgetLight entity={entity} state={state} />;
                     case 'weather':
                         return <WidgetWeather entity={entity} state={state} />;
+                    case 'temperature':
+                        return <WidgetTemperature entity={entity} state={state} />;
+                    case 'binary':
+                        return <WidgetBinary entity={entity} state={state} />;
+
                 }
             case 'group':
                 if (!groupsList || !entitiesList || !statesList) {

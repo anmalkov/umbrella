@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
 using System.Text.Json;
 using Umbrella.Core.Events;
@@ -368,11 +369,17 @@ public class XiaomiExtension : IExtension
             {
                 continue;
             }
-            
+
             await _registrationService.RegisterEntityAsync(entity, Id);
-            devicesIds.Add(new DeviceId(device.Id, entity.Id));
+            var deviceId = GetLocalDeviceIdFromCloudDevice(device);
+            devicesIds.Add(new DeviceId(deviceId, entity.Id));
         }
         return (gateway is not null ? gateway.LocalIp : null, devicesIds);
+    }
+
+    private static string GetLocalDeviceIdFromCloudDevice(XiaomiCloudDevice device)
+    {
+        return device.Id.StartsWith("lumi.") ? device.Id[("lumi.".Length)..] : device.Id;
     }
 
     private IEntity? MapCloudDeviceToEntity(XiaomiCloudDevice device, int index)

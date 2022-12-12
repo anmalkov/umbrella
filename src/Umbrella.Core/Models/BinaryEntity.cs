@@ -8,16 +8,16 @@ namespace Umbrella.Core.Models;
 
 public enum BinaryEntityType
 {
-    Opening,
-    Motion
+    Opening = 1,
+    Motion = 2
 }
 
 public sealed class BinaryEntity : EntityBase
 {
-    public BinaryEntityType Type { get; set; } = default;
+    public BinaryEntityType BinaryType { get; set; } = default;
     
     public BinaryEntity(string id, BinaryEntityType type) : base(id, EntityType.Binary)
     {
-        Type = type;
+        BinaryType = type;
     }
 }

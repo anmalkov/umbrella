@@ -29,7 +29,6 @@ const WeatherIcon = ({ conditionCode, isNight, className }) => {
     let icon = '';
     switch (conditionCode) {
         case 1: // clear
-            console.log("clear");
             isNight ? icon = ClearNight : icon = ClearDay;
             break;
         case 2: // few-clouds

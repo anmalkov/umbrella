@@ -8,7 +8,7 @@ public class GetEntitiesHandler : IRequestHandler<GetEntitiesRequest, IResult>
 {
     private readonly IEntitiesService _entitiesService;
 
-    public record EntityDto(string Id, string? Name, string? Icon, string? Owner, bool Enabled, string Type, string? AreaId);
+    public record EntityDto(string Id, string? Name, string? Icon, string? Owner, bool Enabled, string Type, string? AreaId, object FullObject);
 
     public GetEntitiesHandler(IEntitiesService entitiesService)
     {
@@ -24,7 +24,8 @@ public class GetEntitiesHandler : IRequestHandler<GetEntitiesRequest, IResult>
             e.Owner,
             e.Enabled,
             e.Type.ToString().ToLower(),
-            e.AreaId
+            e.AreaId,
+            e
         ));
         return Results.Ok(entities);
     }

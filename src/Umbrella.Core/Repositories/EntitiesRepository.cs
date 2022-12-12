@@ -15,7 +15,7 @@ namespace Umbrella.Core.Repositories;
 public sealed class EntitiesRepository : IEntitiesRepository
 {
     private const string RepositoryFilename = "entities.json";
-    
+
     private readonly string _repositoryFullFilename;
 
     private ConcurrentDictionary<string, IEntity>? _entities = null;
@@ -26,7 +26,7 @@ public sealed class EntitiesRepository : IEntitiesRepository
         _repositoryFullFilename = Path.Combine(configurationRepository.RepositoriesDirectory, RepositoryFilename);
     }
 
-    
+
     public async Task<List<IEntity>?> GetAllAsync()
     {
         await LoadAsync();
@@ -38,7 +38,7 @@ public sealed class EntitiesRepository : IEntitiesRepository
     {
         await LoadAsync();
 
-        return _entities is not null && _entities.ContainsKey(id) ? _entities[id] : null ;
+        return _entities is not null && _entities.ContainsKey(id) ? _entities[id] : null;
     }
 
     public async Task<List<IEntity>?> GetAsync(EntityType type)
@@ -55,13 +55,13 @@ public sealed class EntitiesRepository : IEntitiesRepository
         return _entities?.Count(e => e.Value.Owner == owner) ?? 0;
     }
 
-    
+
     public async Task AddAsync(IEntity entity)
     {
         await LoadAsync();
 
         _entities!.TryAdd(entity.Id, entity);
-        
+
         await SaveAsync();
     }
 
@@ -76,7 +76,7 @@ public sealed class EntitiesRepository : IEntitiesRepository
 
         await SaveAsync();
     }
-    
+
     public async Task DeleteAsync(string id)
     {
         await LoadAsync();
@@ -118,7 +118,7 @@ public sealed class EntitiesRepository : IEntitiesRepository
         var json = await File.ReadAllTextAsync(_repositoryFullFilename);
 
         var offset = 0;
-        while (true) { 
+        while (true) {
             var startIndex = json.IndexOf('{', offset);
             if (startIndex < 0)
             {
@@ -144,10 +144,24 @@ public sealed class EntitiesRepository : IEntitiesRepository
                         _entities.TryAdd(weatherEntity.Id, weatherEntity);
                     }
                     break;
+                case EntityType.Temperature:
+                    var temperatureEntity = JsonSerializer.Deserialize<TemperatureEntity>(entityJson);
+                    if (temperatureEntity != null)
+                    {
+                        _entities.TryAdd(temperatureEntity.Id, temperatureEntity);
+                    }
+                    break;
+                case EntityType.Binary:
+                    var binaryEntity = JsonSerializer.Deserialize<BinaryEntity>(entityJson);
+                    if (binaryEntity != null)
+                    {
+                        _entities.TryAdd(binaryEntity.Id, binaryEntity);
+                    }
+                    break;
                 default:
                     break;
             }
-            
+
             offset = endIndex + 1;
         }
     }
@@ -158,7 +172,7 @@ public sealed class EntitiesRepository : IEntitiesRepository
         if (!string.IsNullOrEmpty(directoryName) && !Directory.Exists(directoryName)) {
             Directory.CreateDirectory(directoryName);
         }
-        
+
         var json = new StringBuilder("[");
         for (int i = 0; i < _entities?.Count; i++)
         {
@@ -174,6 +188,12 @@ public sealed class EntitiesRepository : IEntitiesRepository
                     break;
                 case EntityType.Weather:
                     json.Append(JsonSerializer.Serialize(entity as WeatherEntity));
+                    break;
+                case EntityType.Temperature:
+                    json.Append(JsonSerializer.Serialize(entity as TemperatureEntity));
+                    break;
+                case EntityType.Binary:
+                    json.Append(JsonSerializer.Serialize(entity as BinaryEntity));
                     break;
                 default:
                     break;
