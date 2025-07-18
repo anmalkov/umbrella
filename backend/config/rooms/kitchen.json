@@ -1,0 +1,20 @@
+{
+  "roomId": "kitchen",
+  "widgets": [
+    {
+      "type": "time",
+      "title": "Current Time",
+      "showTime": true,
+      "timezone": "UTC",
+      "timeFormat": "HH:mm:ss",
+      "showDate": true,
+      "dateFormat": "DD.MM.YYYY",
+      "position": {
+        "x": 0,
+        "y": 0,
+        "w": 2,
+        "h": 1
+      }
+    }
+  ]
+}

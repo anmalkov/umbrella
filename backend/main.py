@@ -5,7 +5,9 @@ FastAPI backend application for the umbrella dashboard.
 import os
 import sys
 import logging
-from fastapi import FastAPI, Request
+import json
+from pathlib import Path
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
@@ -109,6 +111,51 @@ async def debug_info():
         "python_path": sys.path,
         "working_directory": os.getcwd()
     }
+
+@app.get("/api/config/{room_id}")
+async def get_room_config(room_id: str):
+    """
+    Get the configuration for a specific room.
+    
+    Args:
+        room_id: The ID of the room to get configuration for
+        
+    Returns:
+        dict: Room configuration including widgets and layout
+        
+    Raises:
+        HTTPException: If room configuration is not found
+    """
+    logger.debug(f"Getting config for room: {room_id}")
+    
+    # Construct the path to the room config file
+    config_path = Path(__file__).parent / "config" / "rooms" / f"{room_id}.json"
+    
+    if not config_path.exists():
+        logger.warning(f"Room config not found: {config_path}")
+        raise HTTPException(
+            status_code=404, 
+            detail=f"Room configuration not found for room_id: {room_id}"
+        )
+    
+    try:
+        with open(config_path, 'r', encoding='utf-8') as file:
+            config = json.load(file)
+        
+        logger.info(f"Successfully loaded config for room: {room_id}")
+        return config
+    except json.JSONDecodeError as e:
+        logger.error(f"Invalid JSON in config file {config_path}: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Invalid JSON configuration for room: {room_id}"
+        )
+    except Exception as e:
+        logger.error(f"Error reading config file {config_path}: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error reading configuration for room: {room_id}"
+        )
 
 if __name__ == "__main__":
     import uvicorn

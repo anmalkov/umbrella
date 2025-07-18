@@ -11,6 +11,7 @@ Fetch and render widgets dynamically on a dashboard using config from the backen
 - Add GET /api/config/{room_id} endpoint.
 - Load JSON config from src/config/rooms/{room_id}.json.
 - Return the widget layout and configuration as JSON.
+- write unit tests for the endpoint.
 
 Example kitchen.json config should now include layout info:
     ```json
@@ -65,7 +66,6 @@ Example kitchen.json config should now include layout info:
 ```
 /dashboard
 ├── backend/
-│   └── src/
 │       ├── main.py
 │       └── config/
 │           └── rooms/
