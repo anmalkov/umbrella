@@ -11,6 +11,7 @@ from typing import Optional
 from fastapi import FastAPI, Request, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -48,6 +49,13 @@ app = FastAPI(
     debug=os.getenv("DEBUG", "false").lower() == "true"
 )
 
+# Mount React build folder
+app.mount("/static", StaticFiles(directory="frontend/build/static"), name="static")
+
+@app.get("/")
+def serve_root():
+    return FileResponse("frontend/build/index.html")
+
 # Configure CORS middleware for development
 app.add_middleware(
     CORSMiddleware,
@@ -76,7 +84,7 @@ async def health_check():
     logger.debug("Health check endpoint called")
     return {"status": "ok"}
 
-@app.get("/")
+@app.get("/api")
 async def root():
     """
     Root endpoint with basic API information.
@@ -376,6 +384,15 @@ async def list_photos(folder: str):
         "photos": photos,
         "total_images": len(photos)
     }
+
+# Catch-all route for React SPA (must be last!)
+@app.get("/{full_path:path}")
+def serve_spa(full_path: str):
+    """
+    Serve React SPA for any unmatched routes.
+    This must be the last route defined to avoid overriding API endpoints.
+    """
+    return FileResponse("frontend/build/index.html")
 
 if __name__ == "__main__":
     import uvicorn

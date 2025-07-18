@@ -17,7 +17,7 @@ export interface PhotoListResponse {
   total_images: number;
 }
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8081';
+const API_BASE_URL = process.env.REACT_APP_API_URL || '';
 
 /**
  * Get the next photo in the slideshow sequence

@@ -1,0 +1,74 @@
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation
+README.md
+*/README.md
+docs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Dependencies - Frontend
+frontend/node_modules/
+frontend/build/
+frontend/dist/
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/coverage/
+frontend/.env*
+
+# Dependencies - Backend
+backend/__pycache__/
+backend/*.py[cod]
+backend/venv/
+backend/env/
+backend/.env*
+backend/.pytest_cache/
+backend/htmlcov/
+backend/dist/
+backend/build/
+backend/*.egg-info/
+
+# Testing
+**/tests/__pycache__/
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+**/coverage/
+**/.coverage
+**/htmlcov/
+**/.pytest_cache/
+
+# Build artifacts
+**/build/
+**/dist/
+
+# Environment files (keep structure but not values)
+.env*
+!.env.example
+
+# Docker
+docker-compose*.yml
+.dockerignore
+
+# Misc
+*.tmp
+*.temp
+.cache/
