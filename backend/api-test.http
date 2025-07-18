@@ -44,3 +44,134 @@ GET {{baseUrl}}/api/config/kitchen
 Origin: http://localhost:3000
 Access-Control-Request-Method: GET
 Access-Control-Request-Headers: Content-Type
+
+### Photo Slideshow API Tests
+
+### List all photos in kitchen folder
+GET {{baseUrl}}/api/photos/list/kitchen
+
+### List photos in non-existent folder (Should return 404)
+GET {{baseUrl}}/api/photos/list/nonexistent
+
+### Get first photo (next without current parameter)
+GET {{baseUrl}}/api/photos/next?folder=kitchen
+
+### Get next photo after specific image
+GET {{baseUrl}}/api/photos/next?folder=kitchen&current=001.jpg
+
+### Get next photo after image in subfolder
+GET {{baseUrl}}/api/photos/next?folder=kitchen&current=subfolder/002.jpg
+
+### Get previous photo (without current parameter - should return last)
+GET {{baseUrl}}/api/photos/previous?folder=kitchen
+
+### Get previous photo before specific image
+GET {{baseUrl}}/api/photos/previous?folder=kitchen&current=001.jpg
+
+### Get previous photo before image in subfolder
+GET {{baseUrl}}/api/photos/previous?folder=kitchen&current=subfolder/002.jpg
+
+### Get photo file from root folder
+GET {{baseUrl}}/api/photos/file/kitchen/001.jpg
+
+### Get photo file from subfolder
+GET {{baseUrl}}/api/photos/file/kitchen/subfolder/002.jpg
+
+### Get photo file from subfolder (another image)
+GET {{baseUrl}}/api/photos/file/kitchen/subfolder/003.jpg
+
+### Get non-existent photo file (Should return 404)
+GET {{baseUrl}}/api/photos/file/kitchen/nonexistent.jpg
+
+### Photo API with invalid folder (Should return 404)
+GET {{baseUrl}}/api/photos/next?folder=invalid
+
+### Photo API with invalid folder name (Should return 400)
+GET {{baseUrl}}/api/photos/next?folder=../invalid
+
+### Photo API Error Handling Tests
+
+### Test with missing folder parameter (Should return 422)
+GET {{baseUrl}}/api/photos/next
+
+### Test with invalid current parameter (non-existent file)
+GET {{baseUrl}}/api/photos/next?folder=kitchen&current=nonexistent.jpg
+
+### Test with directory traversal attempt (Should return 400)
+GET {{baseUrl}}/api/photos/file/kitchen/../../../etc/passwd
+
+### Photo API with CORS headers
+GET {{baseUrl}}/api/photos/list/kitchen
+Origin: http://localhost:3000
+Access-Control-Request-Method: GET
+Access-Control-Request-Headers: Content-Type
+
+### Photo API with custom headers
+GET {{baseUrl}}/api/photos/next?folder=kitchen
+Accept: application/json
+Content-Type: application/json
+User-Agent: Umbrella Dashboard Frontend
+
+### Advanced Photo Navigation Tests
+
+### Test photo navigation cycle (kitchen folder)
+# 1. Get first photo
+GET {{baseUrl}}/api/photos/next?folder=kitchen
+
+# 2. Get next photo after first
+GET {{baseUrl}}/api/photos/next?folder=kitchen&current=001.jpg
+
+# 3. Get previous photo to cycle back
+GET {{baseUrl}}/api/photos/previous?folder=kitchen&current=subfolder/002.jpg
+
+### Performance and Load Testing
+
+### Multiple rapid requests to test concurrent access
+GET {{baseUrl}}/api/photos/next?folder=kitchen
+
+###
+GET {{baseUrl}}/api/photos/next?folder=kitchen
+
+###
+GET {{baseUrl}}/api/photos/next?folder=kitchen
+
+### Test with custom Accept header
+GET {{baseUrl}}/api/photos/list/kitchen
+Accept: application/json
+
+### Test with custom User-Agent
+GET {{baseUrl}}/api/config/kitchen
+User-Agent: Umbrella Dashboard Test Client
+
+### Integration Tests
+
+### Test complete slideshow workflow
+# 1. Get room config to check slideshow settings
+GET {{baseUrl}}/api/config/kitchen
+
+# 2. List available photos
+GET {{baseUrl}}/api/photos/list/kitchen
+
+# 3. Start slideshow with first photo
+GET {{baseUrl}}/api/photos/next?folder=kitchen
+
+# 4. Navigate through photos
+GET {{baseUrl}}/api/photos/next?folder=kitchen&current=001.jpg
+
+# 5. Go back to previous photo
+GET {{baseUrl}}/api/photos/previous?folder=kitchen&current=subfolder/002.jpg
+
+### Environment and Debug Tests
+
+### Test debug endpoint with different scenarios
+GET {{baseUrl}}/debug/info
+Accept: application/json
+
+### Test health endpoint for monitoring
+GET {{baseUrl}}/api/health
+Accept: application/json
+User-Agent: Health Check Monitor
+
+### Test API root for service discovery
+GET {{baseUrl}}/
+Accept: application/json
