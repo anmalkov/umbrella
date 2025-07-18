@@ -8,7 +8,7 @@
       "timezone": "UTC",
       "timeFormat": "HH:mm:ss",
       "showDate": true,
-      "dateFormat": "DD.MM.YYYY",
+      "dateFormat": "dddd, MMMM DD",
       "position": {
         "x": 0,
         "y": 0,
@@ -24,7 +24,7 @@
       "showTime": true,
       "timeFormat": "HH:mm:ss",
       "showDate": true,
-      "dateFormat": "DD.MM.YYYY"
+      "dateFormat": "dddd, MMMM DD"
     }
   ]
 }
