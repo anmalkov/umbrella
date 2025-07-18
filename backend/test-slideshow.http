@@ -1,0 +1,29 @@
+### Test Photo API Endpoints
+
+# List photos in kitchen folder
+GET http://localhost:8080/api/photos/list/kitchen
+
+###
+
+# Get first photo (next without current)
+GET http://localhost:8080/api/photos/next?folder=kitchen
+
+###
+
+# Get next photo after 001.jpg
+GET http://localhost:8080/api/photos/next?folder=kitchen&current=001.jpg
+
+###
+
+# Get previous photo before 001.jpg (should wrap to last)
+GET http://localhost:8080/api/photos/previous?folder=kitchen&current=001.jpg
+
+###
+
+# Get photo file
+GET http://localhost:8080/api/photos/file/kitchen/001.jpg
+
+###
+
+# Get room config with slideshow
+GET http://localhost:8080/api/config/kitchen

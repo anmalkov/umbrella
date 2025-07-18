@@ -15,6 +15,16 @@
         "w": 2,
         "h": 1
       }
+    },
+    {
+      "type": "slideshow",
+      "folder": "kitchen",
+      "interval": 10,
+      "inactivityDelay": 10,
+      "showTime": true,
+      "timeFormat": "HH:mm:ss",
+      "showDate": true,
+      "dateFormat": "DD.MM.YYYY"
     }
   ]
 }

@@ -7,9 +7,10 @@ import sys
 import logging
 import json
 from pathlib import Path
-from fastapi import FastAPI, Request, HTTPException
+from typing import Optional
+from fastapi import FastAPI, Request, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -156,6 +157,225 @@ async def get_room_config(room_id: str):
             status_code=500,
             detail=f"Error reading configuration for room: {room_id}"
         )
+
+# Photo API endpoints for slideshow functionality
+def get_image_files(folder_path: Path) -> list[str]:
+    """
+    Get all image files from a folder and its subfolders recursively.
+    
+    Args:
+        folder_path: Path to the folder to scan
+        
+    Returns:
+        list: Sorted list of image filenames (relative to folder_path)
+    """
+    valid_extensions = {'.jpg', '.jpeg', '.png', '.webp', '.gif', '.bmp', '.tiff'}
+    image_files = []
+    
+    if not folder_path.exists():
+        return image_files
+    
+    for file_path in folder_path.rglob('*'):
+        if file_path.is_file() and file_path.suffix.lower() in valid_extensions:
+            # Get relative path from folder_path
+            relative_path = file_path.relative_to(folder_path)
+            image_files.append(str(relative_path))
+    
+    return sorted(image_files)
+
+def validate_folder_path(folder: str) -> Path:
+    """
+    Validate and construct the full path to a photo folder.
+    
+    Args:
+        folder: Folder name (e.g., 'kitchen')
+        
+    Returns:
+        Path: Full path to the folder
+        
+    Raises:
+        HTTPException: If folder is invalid or doesn't exist
+    """
+    # Sanitize folder name to prevent directory traversal
+    if not folder or '..' in folder or '/' in folder or '\\' in folder:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid folder name"
+        )
+    
+    photos_dir = Path(__file__).parent / "photos"
+    folder_path = photos_dir / folder
+    
+    if not folder_path.exists():
+        raise HTTPException(
+            status_code=404,
+            detail=f"Photo folder not found: {folder}"
+        )
+    
+    if not folder_path.is_dir():
+        raise HTTPException(
+            status_code=400,
+            detail=f"Path is not a directory: {folder}"
+        )
+    
+    return folder_path
+
+@app.get("/api/photos/next")
+async def get_next_photo(folder: str = Query(..., description="Photo folder name"), 
+                        current: Optional[str] = Query(None, description="Current photo filename")):
+    """
+    Get the next photo in the slideshow sequence.
+    
+    Args:
+        folder: Name of the photo folder
+        current: Current photo filename (optional)
+        
+    Returns:
+        dict: Next photo information
+    """
+    logger.debug(f"Getting next photo for folder: {folder}, current: {current}")
+    
+    folder_path = validate_folder_path(folder)
+    image_files = get_image_files(folder_path)
+    
+    if not image_files:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No images found in folder: {folder}"
+        )
+    
+    if not current:
+        # Return first image if no current image specified
+        next_image = image_files[0]
+    else:
+        try:
+            current_index = image_files.index(current)
+            # Get next image, wrap around to first if at end
+            next_index = (current_index + 1) % len(image_files)
+            next_image = image_files[next_index]
+        except ValueError:
+            # Current image not found, return first image
+            next_image = image_files[0]
+    
+    logger.info(f"Next photo: {next_image}")
+    return {
+        "filename": next_image,
+        "url": f"/api/photos/file/{folder}/{next_image}",
+        "total_images": len(image_files)
+    }
+
+@app.get("/api/photos/previous")
+async def get_previous_photo(folder: str = Query(..., description="Photo folder name"), 
+                           current: Optional[str] = Query(None, description="Current photo filename")):
+    """
+    Get the previous photo in the slideshow sequence.
+    
+    Args:
+        folder: Name of the photo folder
+        current: Current photo filename (optional)
+        
+    Returns:
+        dict: Previous photo information
+    """
+    logger.debug(f"Getting previous photo for folder: {folder}, current: {current}")
+    
+    folder_path = validate_folder_path(folder)
+    image_files = get_image_files(folder_path)
+    
+    if not image_files:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No images found in folder: {folder}"
+        )
+    
+    if not current:
+        # Return last image if no current image specified
+        previous_image = image_files[-1]
+    else:
+        try:
+            current_index = image_files.index(current)
+            # Get previous image, wrap around to last if at beginning
+            previous_index = (current_index - 1) % len(image_files)
+            previous_image = image_files[previous_index]
+        except ValueError:
+            # Current image not found, return last image
+            previous_image = image_files[-1]
+    
+    logger.info(f"Previous photo: {previous_image}")
+    return {
+        "filename": previous_image,
+        "url": f"/api/photos/file/{folder}/{previous_image}",
+        "total_images": len(image_files)
+    }
+
+@app.get("/api/photos/file/{folder}/{filename:path}")
+async def get_photo_file(folder: str, filename: str):
+    """
+    Serve a specific photo file.
+    
+    Args:
+        folder: Name of the photo folder
+        filename: Photo filename (can include subdirectory path)
+        
+    Returns:
+        FileResponse: The photo file
+    """
+    logger.debug(f"Serving photo file: {folder}/{filename}")
+    
+    folder_path = validate_folder_path(folder)
+    file_path = folder_path / filename
+    
+    if not file_path.exists():
+        raise HTTPException(
+            status_code=404,
+            detail=f"Photo file not found: {filename}"
+        )
+    
+    if not file_path.is_file():
+        raise HTTPException(
+            status_code=400,
+            detail=f"Path is not a file: {filename}"
+        )
+    
+    # Security check: ensure file is within the folder
+    try:
+        file_path.resolve().relative_to(folder_path.resolve())
+    except ValueError:
+        raise HTTPException(
+            status_code=403,
+            detail="Access denied"
+        )
+    
+    return FileResponse(file_path)
+
+@app.get("/api/photos/list/{folder}")
+async def list_photos(folder: str):
+    """
+    List all photos in a folder.
+    
+    Args:
+        folder: Name of the photo folder
+        
+    Returns:
+        dict: List of photo information
+    """
+    logger.debug(f"Listing photos in folder: {folder}")
+    
+    folder_path = validate_folder_path(folder)
+    image_files = get_image_files(folder_path)
+    
+    photos = []
+    for filename in image_files:
+        photos.append({
+            "filename": filename,
+            "url": f"/api/photos/file/{folder}/{filename}"
+        })
+    
+    return {
+        "folder": folder,
+        "photos": photos,
+        "total_images": len(photos)
+    }
 
 if __name__ == "__main__":
     import uvicorn
