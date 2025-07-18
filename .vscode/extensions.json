@@ -1,0 +1,20 @@
+{
+    "recommendations": [
+        "ms-python.python",
+        "ms-python.debugpy",
+        "ms-python.black-formatter",
+        "ms-python.flake8",
+        "ms-python.pylint",
+        "ms-python.mypy-type-checker",
+        "humao.rest-client",
+        "ms-vscode.vscode-json",
+        "redhat.vscode-yaml",
+        "ms-python.autopep8",
+        "ms-toolsai.jupyter",
+        "ms-python.isort",
+        "tamasfe.even-better-toml",
+        "charliermarsh.ruff",
+        "ms-vscode.test-adapter-converter",
+        "littlefoxteam.vscode-python-test-adapter"
+    ]
+}

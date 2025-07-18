@@ -1,0 +1,40 @@
+{
+    "python.pythonPath": "./backend/venv/Scripts/python.exe",
+    "python.defaultInterpreterPath": "./backend/venv/Scripts/python.exe",
+    "python.terminal.activateEnvironment": true,
+    "python.terminal.activateEnvInCurrentTerminal": true,
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": false,
+    "python.linting.flake8Enabled": true,
+    "python.formatting.provider": "black",
+    "python.formatting.blackArgs": ["--line-length", "88"],
+    "python.testing.pytestEnabled": true,
+    "python.testing.pytestArgs": [
+        "backend/tests"
+    ],
+    "python.testing.cwd": "${workspaceFolder}/backend",
+    "python.analysis.typeCheckingMode": "basic",
+    "python.analysis.autoImportCompletions": true,
+    "files.exclude": {
+        "**/__pycache__": true,
+        "**/.pytest_cache": true,
+        "**/venv": false,
+        "**/.git": true
+    },
+    "files.watcherExclude": {
+        "**/venv/**": true,
+        "**/__pycache__/**": true,
+        "**/.pytest_cache/**": true
+    },
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "explicit"
+    },
+    "terminal.integrated.cwd": "${workspaceFolder}/backend",
+    "terminal.integrated.env.windows": {
+        "PYTHONPATH": "${workspaceFolder}/backend"
+    },
+    "rest-client.defaultHeaders": {
+        "Content-Type": "application/json"
+    }
+}

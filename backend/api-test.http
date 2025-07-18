@@ -1,0 +1,29 @@
+### FastAPI Backend API Testing
+
+@baseUrl = http://localhost:8081
+
+### Health Check Endpoint
+GET {{baseUrl}}/api/health
+
+### Root Endpoint
+GET {{baseUrl}}/
+
+### API Documentation
+GET {{baseUrl}}/docs
+
+### Alternative API Documentation
+GET {{baseUrl}}/redoc
+
+### Debug Info (Development Only)
+GET {{baseUrl}}/debug/info
+
+### Test with headers
+GET {{baseUrl}}/api/health
+Accept: application/json
+Content-Type: application/json
+
+### Test CORS with custom headers
+GET {{baseUrl}}/api/health
+Origin: http://localhost:3000
+Access-Control-Request-Method: GET
+Access-Control-Request-Headers: Content-Type
