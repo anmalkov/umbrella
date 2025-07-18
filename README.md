@@ -7,12 +7,14 @@ A modern smart home dashboard application with photo slideshow capabilities, bui
 ## 🌟 Features
 
 ### Smart Home Dashboard
+
 - **Room-based Configuration**: Dynamic layouts loaded from backend API
 - **Widget System**: Extensible widget architecture (Time, Slideshow, and more)
 - **Responsive Grid Layout**: Configurable widget positioning
 - **Dark/Light Mode Toggle**: Modern UI with theme switching
 
 ### Photo Slideshow
+
 - **Auto-triggered Slideshow**: Activates after configurable idle time
 - **Navigation Controls**: Click zones and keyboard shortcuts
 - **Time/Date Overlay**: Optional time and date display during slideshow
@@ -20,6 +22,7 @@ A modern smart home dashboard application with photo slideshow capabilities, bui
 - **Multiple Formats**: Support for JPG, PNG, WebP, GIF, BMP, TIFF
 
 ### User Experience
+
 - **Idle Detection**: Smart user activity detection
 - **CORS Support**: Seamless frontend-backend integration
 - **Error Handling**: Comprehensive error management
@@ -30,12 +33,14 @@ A modern smart home dashboard application with photo slideshow capabilities, bui
 This application consists of two main components:
 
 ### Frontend (React + TypeScript)
+
 - **Framework**: React 19.1.0 with TypeScript
 - **UI Library**: Tailwind CSS + Radix UI
 - **State Management**: React hooks and context
 - **Build Tool**: Create React App
 
 ### Backend (FastAPI + Python)
+
 - **Framework**: FastAPI with Python 3.8+
 - **File Serving**: Secure photo file serving
 - **Configuration**: JSON-based room configurations
@@ -44,17 +49,20 @@ This application consists of two main components:
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - **Node.js** 16.0 or higher
 - **Python** 3.8 or higher
 - **npm** or **yarn**
 
 ### 1. Clone the Repository
+
 ```bash
 git clone https://github.com/anmalkov/umbrella.git
 cd umbrella/dashboard
 ```
 
 ### 2. Backend Setup
+
 ```bash
 # Navigate to backend directory
 cd backend
@@ -78,6 +86,7 @@ python main.py
 The backend will be available at `http://localhost:8081`
 
 ### 3. Frontend Setup
+
 ```bash
 # Navigate to frontend directory (in a new terminal)
 cd frontend
@@ -96,7 +105,7 @@ The frontend will be available at `http://localhost:3000`
 
 ## 📁 Project Structure
 
-```
+```text
 umbrella/dashboard/
 ├── backend/                    # FastAPI backend
 │   ├── config/                # Room configurations
@@ -160,7 +169,7 @@ Create room configurations in `backend/config/rooms/{room_id}.json`:
 
 Place photos in `backend/photos/{room_id}/`:
 
-```
+```text
 backend/photos/
 ├── kitchen/
 │   ├── 001.jpg
@@ -176,14 +185,17 @@ backend/photos/
 ## 🔧 API Endpoints
 
 ### Core Endpoints
+
 - `GET /` - API information
 - `GET /api/health` - Health check
 - `GET /debug/info` - Debug information (development only)
 
-### Room Configuration
+### Room Configuration in API
+
 - `GET /api/config/{room_id}` - Get room configuration
 
 ### Photo Management
+
 - `GET /api/photos/list/{folder}` - List photos in folder
 - `GET /api/photos/next` - Get next photo in sequence
 - `GET /api/photos/previous` - Get previous photo in sequence
@@ -192,17 +204,20 @@ backend/photos/
 ## 🎮 Usage
 
 ### Dashboard Navigation
+
 1. **Room Selection**: Use the navigation panel to switch between rooms
 2. **Widget Interaction**: Widgets display real-time information
 3. **Theme Toggle**: Switch between dark and light modes
 
 ### Slideshow Controls
+
 - **Auto-activation**: Slideshow starts after idle timeout
 - **Navigation**: Click left/right sides to navigate photos
 - **Exit**: Click center or press ESC to exit slideshow
 - **Keyboard**: ESC key exits slideshow
 
 ### Idle Detection
+
 - **Configurable timeout**: Set per room (default: 10 seconds)
 - **Activity tracking**: Keyboard, scroll, touch events
 - **Smart detection**: Excludes mouse movement to prevent accidental activation
@@ -210,19 +225,23 @@ backend/photos/
 ## 🧪 Testing
 
 ### Backend Tests
+
 ```bash
 cd backend
 python -m pytest tests/ -v
 ```
 
 ### Frontend Tests
+
 ```bash
 cd frontend
 npm test
 ```
 
 ### API Testing
+
 Use the provided HTTP test files:
+
 - `backend/api-test.http` - Core API endpoints
 - `backend/test-slideshow.http` - Slideshow functionality
 
@@ -231,6 +250,7 @@ Use the provided HTTP test files:
 ### Production Build
 
 **Backend:**
+
 ```bash
 cd backend
 pip install -r requirements.txt
@@ -238,6 +258,7 @@ python main.py
 ```
 
 **Frontend:**
+
 ```bash
 cd frontend
 npm run build
@@ -246,6 +267,7 @@ npm run build
 ### Environment Variables
 
 **Backend:**
+
 ```env
 DEBUG=false
 LOG_LEVEL=INFO
@@ -253,11 +275,13 @@ ENVIRONMENT=production
 ```
 
 **Frontend:**
+
 ```env
 REACT_APP_API_URL=https://your-api-domain.com
 ```
 
 ### Deployment Options
+
 - **Docker**: Containerized deployment
 - **Cloud Services**: AWS, Azure, Google Cloud
 - **Static Hosting**: Netlify, Vercel for frontend
@@ -266,18 +290,21 @@ REACT_APP_API_URL=https://your-api-domain.com
 ## 🛠️ Development
 
 ### Backend Development
+
 - **FastAPI**: Modern Python web framework
 - **Auto-reload**: Development server with hot reload
 - **API Documentation**: Available at `/docs` and `/redoc`
 - **Logging**: Configurable logging levels
 
 ### Frontend Development
+
 - **React**: Component-based architecture
 - **TypeScript**: Type safety and better DX
 - **Tailwind CSS**: Utility-first styling
 - **Hot Reload**: Instant updates during development
 
 ### Code Quality
+
 - **ESLint**: JavaScript/TypeScript linting
 - **Prettier**: Code formatting
 - **Type Checking**: Full TypeScript support
@@ -286,6 +313,7 @@ REACT_APP_API_URL=https://your-api-domain.com
 ## 📚 Technology Stack
 
 ### Frontend
+
 - **React 19.1.0** - UI framework
 - **TypeScript** - Type safety
 - **Tailwind CSS** - Styling
@@ -293,6 +321,7 @@ REACT_APP_API_URL=https://your-api-domain.com
 - **Lucide React** - Icon library
 
 ### Backend
+
 - **FastAPI** - Web framework
 - **Python 3.8+** - Programming language
 - **Uvicorn** - ASGI server
@@ -300,6 +329,7 @@ REACT_APP_API_URL=https://your-api-domain.com
 - **pytest** - Testing framework
 
 ### Development Tools
+
 - **VS Code** - IDE configuration included
 - **GitHub Copilot** - AI assistance
 - **Create React App** - Frontend tooling
@@ -316,6 +346,7 @@ REACT_APP_API_URL=https://your-api-domain.com
 7. **Open a Pull Request**: Describe your changes
 
 ### Development Guidelines
+
 - Follow TypeScript best practices
 - Write tests for new features
 - Use conventional commit messages
@@ -340,13 +371,11 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🔮 Roadmap
 
+- [ ] **Docker Support**: Container deployment
 - [ ] **Weather Widget**: Weather information display
 - [ ] **Calendar Widget**: Calendar and events
-- [ ] **News Widget**: RSS feed integration
-- [ ] **Music Widget**: Music player integration
 - [ ] **Voice Control**: Voice command support
 - [ ] **Mobile App**: React Native mobile application
-- [ ] **Docker Support**: Container deployment
 - [ ] **Database Integration**: Persistent data storage
 
 ---

@@ -5,12 +5,14 @@ A React-based smart home dashboard application with photo slideshow capabilities
 ## Features
 
 ### 🏠 Smart Home Dashboard
+
 - **Room-based Configuration**: Dynamic room layouts loaded from backend API
 - **Widget System**: Extensible widget architecture (Time widgets, Slideshow widgets)
 - **Grid Layout**: Responsive grid system with configurable widget positioning
 - **Dark/Light Mode**: Toggle between dark and light themes
 
 ### 📸 Photo Slideshow
+
 - **Auto-triggered Slideshow**: Activates after configurable idle time
 - **Navigation Controls**: Click zones for previous/next photo navigation
 - **Keyboard Support**: ESC key to exit slideshow
@@ -19,6 +21,7 @@ A React-based smart home dashboard application with photo slideshow capabilities
 - **Multiple Formats**: Support for JPG, PNG, WebP, GIF, BMP, TIFF
 
 ### 🎛️ User Interface
+
 - **Responsive Design**: Works on desktop and mobile devices
 - **Navigation Panel**: Room selection and navigation
 - **Modern UI**: Built with Tailwind CSS and Radix UI components
@@ -44,22 +47,26 @@ A React-based smart home dashboard application with photo slideshow capabilities
 ### Installation
 
 1. **Clone the repository and navigate to frontend directory:**
+
    ```bash
    cd frontend
    ```
 
 2. **Install dependencies:**
+
    ```bash
    npm install
    ```
 
 3. **Configure environment variables:**
    Create a `.env` file in the frontend directory:
+
    ```env
    REACT_APP_API_URL=http://localhost:8081
    ```
 
 4. **Start the development server:**
+
    ```bash
    npm start
    ```
@@ -112,6 +119,7 @@ Rooms are configured via the backend API. Each room can contain:
 - **Slideshow Widgets**: Photo slideshow with configurable settings
 
 Example room configuration structure:
+
 ```json
 {
   "roomId": "kitchen",
@@ -142,7 +150,7 @@ Example room configuration structure:
 
 ## Application Structure
 
-```
+```text
 frontend/
 ├── public/                 # Static assets
 │   ├── index.html         # Main HTML template
@@ -179,23 +187,27 @@ frontend/
 ## Key Components
 
 ### GridDashboard
+
 - Manages room configuration loading
 - Handles widget positioning and rendering
 - Integrates slideshow functionality
 - Manages idle state detection
 
 ### SlideshowOverlay
+
 - Full-screen photo slideshow
 - Navigation controls and keyboard shortcuts
 - Time/date overlay display
 - Error handling and loading states
 
 ### TimeWidget
+
 - Configurable time and date display
 - Multiple timezone support
 - Customizable formatting options
 
 ### NavigationPanel
+
 - Room selection interface
 - Responsive design
 - Integration with main dashboard
@@ -203,17 +215,20 @@ frontend/
 ## Slideshow Controls
 
 ### Navigation
+
 - **Left side click**: Previous photo
 - **Right side click**: Next photo
 - **Center click**: Exit slideshow
 - **ESC key**: Exit slideshow
 
 ### Auto-advance
+
 - Configurable interval (default: 10 seconds)
 - Pauses on user interaction
 - Resumes after interaction timeout
 
 ### Idle Detection
+
 - **Configurable timeout**: Set per room (default: 10 seconds)
 - **Activity events**: Keyboard, scroll, touch (excludes mouse movement)
 - **Visibility API**: Handles tab switching and window focus
@@ -222,10 +237,12 @@ frontend/
 
 The frontend communicates with the backend API for:
 
-### Room Configuration
+### Room Configuration in UI
+
 - `GET /api/config/{roomId}` - Load room widget configuration
 
 ### Photo Management
+
 - `GET /api/photos/list/{folder}` - List available photos
 - `GET /api/photos/next` - Get next photo in sequence
 - `GET /api/photos/previous` - Get previous photo in sequence
@@ -234,17 +251,20 @@ The frontend communicates with the backend API for:
 ## Development
 
 ### Project Structure
+
 - **Component-based architecture**: Modular, reusable components
 - **TypeScript**: Full type safety and IntelliSense support
 - **Custom hooks**: Reusable logic (idle detection, API calls)
 - **Utility functions**: Centralized helper functions
 
 ### Testing
+
 - **Jest**: Testing framework
 - **React Testing Library**: Component testing utilities
 - **Test coverage**: Component and utility function tests
 
 ### Styling
+
 - **Tailwind CSS**: Utility-first styling approach
 - **CSS Custom Properties**: Theme variables for dark/light mode
 - **Responsive design**: Mobile-first approach
@@ -252,19 +272,24 @@ The frontend communicates with the backend API for:
 ## Deployment
 
 ### Production Build
+
 ```bash
 npm run build
 ```
 
 ### Static Hosting
+
 The built application can be deployed to:
+
 - **Netlify**: Drag and drop deployment
 - **Vercel**: Git-based deployment
 - **AWS S3**: Static website hosting
 - **GitHub Pages**: Free hosting for public repositories
 
 ### Environment Configuration
+
 Set the production API URL:
+
 ```env
 REACT_APP_API_URL=https://your-api-domain.com
 ```
