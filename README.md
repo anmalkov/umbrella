@@ -247,6 +247,54 @@ Use the provided HTTP test files:
 
 ## 🚀 Deployment
 
+### Docker Deployment
+
+This project includes automated Docker image building and publishing to Docker Hub via GitHub Actions.
+
+#### Using Pre-built Docker Image
+
+```bash
+# Pull and run the latest image
+docker run -p 80:80 anmalkov/umbrella:latest
+
+# Or run a specific version
+docker run -p 80:80 anmalkov/umbrella:v1.0.0
+```
+
+#### Automated Publishing
+
+The project automatically builds and publishes Docker images when you create a new tag:
+
+```bash
+# Create and push a tag to trigger Docker build
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+This will:
+- Build a multi-architecture Docker image (AMD64 and ARM64)
+- Push to Docker Hub as `anmalkov/umbrella`
+- Tag with version numbers (e.g., `v1.0.0`, `1.0`, `1`)
+
+#### Setting up Docker Hub Publishing
+
+To enable automatic Docker publishing, add these secrets to your GitHub repository:
+
+1. Go to your GitHub repository → Settings → Secrets and variables → Actions
+2. Add the following repository secrets:
+   - `DOCKER_USERNAME`: Your Docker Hub username
+   - `DOCKER_PASSWORD`: Your Docker Hub password or access token
+
+### Manual Docker Build
+
+```bash
+# Build the image locally
+docker build -t umbrella-dashboard .
+
+# Run the container
+docker run -p 80:80 umbrella-dashboard
+```
+
 ### Production Build
 
 **Backend:**
@@ -282,7 +330,8 @@ REACT_APP_API_URL=https://your-api-domain.com
 
 ### Deployment Options
 
-- **Docker**: Containerized deployment
+- **Docker Hub**: Automated container deployment with `anmalkov/umbrella`
+- **Docker**: Manual containerized deployment
 - **Cloud Services**: AWS, Azure, Google Cloud
 - **Static Hosting**: Netlify, Vercel for frontend
 - **VPS**: Traditional server deployment
