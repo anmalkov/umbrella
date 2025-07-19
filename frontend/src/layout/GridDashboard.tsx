@@ -14,13 +14,21 @@ const GridDashboard: React.FC<GridDashboardProps> = ({ roomId, onSlideshowStateC
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [slideshowConfig, setSlideshowConfig] = useState<SlideshowWidgetConfig | null>(null);
+  const [isSlideshowActive, setIsSlideshowActive] = useState(false);
 
   // Setup idle detection for slideshow (excluding mouse events)
+  // When slideshow is active, disable event listening to prevent slideshow navigation from triggering idle reset
   const { isIdle, reset } = useIdle({
     timeout: slideshowConfig ? slideshowConfig.inactivityDelay * 1000 : 60000,
     initialState: false,
-    events: ['keypress', 'scroll', 'touchstart'], // Removed 'mousemove', 'click', and 'mousedown'
+    events: ['keypress', 'scroll', 'touchstart', 'click', 'mousedown', 'mousemove'],
+    disabled: isSlideshowActive, // Disable idle detection when slideshow is active
   });
+
+  // Track slideshow state changes
+  useEffect(() => {
+    setIsSlideshowActive(isIdle);
+  }, [isIdle]);
 
   // Notify parent about slideshow state changes
   useEffect(() => {

@@ -4,6 +4,7 @@ export interface UseIdleOptions {
   timeout: number; // timeout in milliseconds
   events?: string[]; // events to track for activity
   initialState?: boolean; // initial idle state
+  disabled?: boolean; // when true, disables event listening (but keeps timeout running)
 }
 
 const DEFAULT_EVENTS = [
@@ -22,6 +23,7 @@ export function useIdle({
   timeout,
   events = DEFAULT_EVENTS,
   initialState = false,
+  disabled = false,
 }: UseIdleOptions) {
   const [isIdle, setIsIdle] = useState(initialState);
 
@@ -49,23 +51,28 @@ export function useIdle({
     // Set initial timeout
     timeoutId = setTimeout(() => setIsIdle(true), timeout);
 
-    // Add event listeners
-    events.forEach(event => {
-      document.addEventListener(event, handleActivity, true);
-    });
+    // Only add event listeners if not disabled
+    if (!disabled) {
+      // Add event listeners
+      events.forEach(event => {
+        document.addEventListener(event, handleActivity, true);
+      });
 
-    // Listen for visibility changes
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+      // Listen for visibility changes
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+    }
 
     // Cleanup
     return () => {
       clearTimeout(timeoutId);
-      events.forEach(event => {
-        document.removeEventListener(event, handleActivity, true);
-      });
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      if (!disabled) {
+        events.forEach(event => {
+          document.removeEventListener(event, handleActivity, true);
+        });
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+      }
     };
-  }, [timeout, events]);
+  }, [timeout, events, disabled]);
 
   return { isIdle, reset };
 }
